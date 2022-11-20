@@ -30,6 +30,7 @@
   "homepage": "https://github.com/andrewkukhar/chess-online#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "http": "^0.0.1-security",
     "path": "^0.12.7",
