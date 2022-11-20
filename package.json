@@ -1,0 +1,42 @@
+{
+  "name": "chess-online",
+  "version": "1.0.0",
+  "description": "online chess multiplayer",
+  "main": "app.js",
+  "scripts": {
+    "heroku-postbuild": "cd client && npm install && npm run build",
+    "start": "node app.js",
+    "server": "nodemon app.js",
+    "client": "npm run start --prefix client",
+    "client:deploy": "concurrently \"npm run client:install\" \"npm run client:build\"",
+    "client:install": "npm install --prefix client",
+    "client:build": "npm run build --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrewkukhar/chess-online.git"
+  },
+  "keywords": [
+    "chess",
+    "game",
+    "online"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/andrewkukhar/chess-online/issues"
+  },
+  "homepage": "https://github.com/andrewkukhar/chess-online#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "http": "^0.0.1-security",
+    "path": "^0.12.7",
+    "socket.io": "^4.5.3",
+    "socket.io-client": "^4.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
