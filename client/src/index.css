@@ -105,3 +105,15 @@ h3{
     height: 48px;
   }
 }
+@media (min-width: 760px) {
+  .square {
+    height: 60px;
+    width: 60px;
+  }
+  .game-info {
+    width: 100%;
+    text-align: start;
+    margin-left: 50%;
+  }
+  
+}
