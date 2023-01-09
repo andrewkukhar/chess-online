@@ -1,5 +1,6 @@
 import React from 'react';
 import './index.css';
+import logo from './chess-logo.png'
 import Board from './components/board.js';
 import King from './pieces/king'
 import FallenSoldierBlock from './components/fallen-soldier-block.js';
@@ -111,6 +112,7 @@ export default class Game extends React.Component {
     return (
       <div>
         <div className="game">
+          <img src={logo} className="logo" alt="logo" />
           <div className="game-board">
             <Board
               squares={this.state.squares}
