@@ -16,8 +16,17 @@ const Game = () => {
   const [squares, setSquares] = useState(() => {
     const savedState = localStorage.getItem("chessGameState");
     if (savedState) {
-      const parsedState = JSON.parse(savedState);
-      return deserializeSquares(parsedState.squares);
+      try {
+        const parsedState = JSON.parse(savedState);
+        const deserialized = deserializeSquares(parsedState.squares);
+        if (Array.isArray(deserialized) && deserialized.length === 64) {
+          return deserialized;
+        } else {
+          console.warn("Invalid deserialized squares. Initializing new board.");
+        }
+      } catch (error) {
+        console.error("Error deserializing squares:", error);
+      }
     }
     return initialiseChessBoard();
   });
@@ -200,6 +209,7 @@ const Game = () => {
       setStatus,
       setSelectedSquare,
     });
+    setHistory([]);
     setOpenConfirm(false);
   };
 
@@ -213,10 +223,8 @@ const Game = () => {
       return;
     }
 
-    // Retrieve the last state from history
     const lastState = history[history.length - 1];
 
-    // Revert to the last state
     setSquares(lastState.squares);
     setWhiteFallenSoldiers(lastState.whiteFallenSoldiers);
     setBlackFallenSoldiers(lastState.blackFallenSoldiers);
@@ -225,7 +233,6 @@ const Game = () => {
     setStatus(lastState.status);
     setSelectedSquare(lastState.selectedSquare);
 
-    // Remove the last state from history
     setHistory(history.slice(0, history.length - 1));
   };
 
