@@ -1,27 +1,45 @@
-const diagonalDictionaryTLBR = require('../dictionaries/diagonalTopLeftBottomRight.json');
-const diagonalDictionaryTRBL = require('../dictionaries/diagonalTopRightBottomLeft.json');
-const rowDictionary = require('../dictionaries/row.json');
-const columnDictionary = require('../dictionaries/column.json');
+// src/helpers/index.js
 
+/**
+ * Checks if two squares are on the same row.
+ * @param {number} src - Source square index (0-63)
+ * @param {number} dest - Destination square index (0-63)
+ * @returns {boolean}
+ */
 const isSameRow = (src, dest) => {
-    return !!(rowDictionary[src] && rowDictionary[src][dest]);
-}
+  return Math.floor(src / 8) === Math.floor(dest / 8);
+};
 
+/**
+ * Checks if two squares are on the same column.
+ * @param {number} src - Source square index (0-63)
+ * @param {number} dest - Destination square index (0-63)
+ * @returns {boolean}
+ */
 const isSameColumn = (src, dest) => {
-    return !!(columnDictionary[src] && columnDictionary[src][dest]);
-}
+  return src % 8 === dest % 8;
+};
 
+/**
+ * Checks if two squares are on the same diagonal.
+ * @param {number} src - Source square index (0-63)
+ * @param {number} dest - Destination square index (0-63)
+ * @returns {boolean}
+ */
 const isSameDiagonal = (src, dest) => {
-    return !!((diagonalDictionaryTLBR[src] && diagonalDictionaryTLBR[src][dest]) ||
-        (diagonalDictionaryTRBL[src] && diagonalDictionaryTRBL[src][dest]))
-}
+  const rowDiff = Math.abs(Math.floor(src / 8) - Math.floor(dest / 8));
+  const colDiff = Math.abs((src % 8) - (dest % 8));
+  return rowDiff === colDiff;
+};
 
-const isPathClean = (srcToDestPath, squares) => srcToDestPath.reduce((acc, curr) => !squares[curr] && acc, true)
+/**
+ * Checks if all squares in the path are unoccupied.
+ * @param {number[]} srcToDestPath - Array of square indices between src and dest (exclusive)
+ * @param {Array} squares - Current state of the board
+ * @returns {boolean}
+ */
+const isPathClean = (srcToDestPath, squares) => {
+  return srcToDestPath.every((square) => squares[square] === null);
+};
 
-
-module.exports = {
-    isSameRow,
-    isSameColumn,
-    isSameDiagonal,
-    isPathClean
-}
+export { isSameRow, isSameColumn, isSameDiagonal, isPathClean };

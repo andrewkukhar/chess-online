@@ -1,43 +1,45 @@
-import Piece from './piece.js';
-import { isSameRow, isSameColumn, isPathClean } from '../helpers'
+// src/pieces/rook.js
+import Piece from "./piece.js";
+import { isSameRow, isSameColumn, isPathClean } from "../helpers";
 
 export default class Rook extends Piece {
-    constructor(player) {
-        super(player, (player === 1 ? "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg" : "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg"));
+  constructor(player) {
+    super(
+      player,
+      player === 1
+        ? "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg"
+        : "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg"
+    );
+  }
+
+  isMovePossible(src, dest, squares) {
+    if (!(isSameRow(src, dest) || isSameColumn(src, dest))) return false;
+    const path = this.getSrcToDestPath(src, dest);
+    return isPathClean(path, squares);
+  }
+
+  /**
+   * Dynamically calculates the path between src and dest (exclusive)
+   * @param {number} src - Source square index (0-63)
+   * @param {number} dest - Destination square index (0-63)
+   * @returns {number[]} - Array of square indices between src and dest
+   */
+  getSrcToDestPath(src, dest) {
+    const path = [];
+    const step = isSameRow(src, dest)
+      ? dest > src
+        ? 1
+        : -1
+      : dest > src
+      ? 8
+      : -8;
+
+    let current = src + step;
+    while (current !== dest) {
+      path.push(current);
+      current += step;
     }
 
-    isMovePossible(src, dest, squares) {
-        return isPathClean(this.getSrcToDestPath(src, dest), squares) && (isSameColumn(src, dest) || isSameRow(src, dest));
-    }
-
-    /**
-     * get path between src and dest (src and dest exclusive)
-     * @param  {num} src  
-     * @param  {num} dest 
-     * @return {[array]}      
-     */
-    getSrcToDestPath(src, dest) {
-        let path = [], pathStart, pathEnd, incrementBy;
-        if (src > dest) {
-            pathStart = dest;
-            pathEnd = src;
-        }
-        else {
-            pathStart = src;
-            pathEnd = dest;
-        }
-        if (Math.abs(src - dest) % 8 === 0) {
-            incrementBy = 8;
-            pathStart += 8;
-        }
-        else {
-            incrementBy = 1;
-            pathStart += 1;
-        }
-
-        for (let i = pathStart; i < pathEnd; i += incrementBy) {
-            path.push(i);
-        }
-        return path;
-    }
+    return path;
+  }
 }

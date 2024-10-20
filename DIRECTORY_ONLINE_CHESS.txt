@@ -1,0 +1,41 @@
+.tree -I 'node_modules|build' > DIRECTORY_ONLINE_CHESS.txt
+├── DIRECTORY_ONLINE_CHESS.txt
+├── app.js
+├── client
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── public
+│   │   ├── chess-logo.png
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   └── robots.txt
+│   └── src
+│       ├── App.js
+│       ├── chess-logo.png
+│       ├── components
+│       │   ├── board.js
+│       │   ├── fallen-soldier-block.js
+│       │   └── square.js
+│       ├── dictionaries
+│       │   ├── column.json
+│       │   ├── diagonalTopLeftBottomRight.json
+│       │   ├── diagonalTopRightBottomLeft.json
+│       │   └── row.json
+│       ├── helpers
+│       │   ├── board-initialiser.js
+│       │   └── index.js
+│       ├── index.css
+│       ├── index.js
+│       └── pieces
+│           ├── bishop.js
+│           ├── king.js
+│           ├── knight.js
+│           ├── pawn.js
+│           ├── piece.js
+│           ├── queen.js
+│           └── rook.js
+├── package-lock.json
+└── package.json
+
+8 directories, 31 files

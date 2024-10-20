@@ -1,51 +1,64 @@
-import Piece from './piece.js';
-import { isSameRow, isSameColumn, isSameDiagonal, isPathClean } from '../helpers'
+// src/pieces/queen.js
+import Piece from "./piece.js";
+import {
+  isSameRow,
+  isSameColumn,
+  isSameDiagonal,
+  isPathClean,
+} from "../helpers";
 
 export default class Queen extends Piece {
-    constructor(player) {
-        super(player, (player === 1 ? "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg" : "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg"));
+  constructor(player) {
+    super(
+      player,
+      player === 1
+        ? "https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg"
+        : "https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg"
+    );
+  }
+
+  isMovePossible(src, dest, squares) {
+    // Check if the move is along the same row, column, or diagonal
+    if (
+      !(
+        isSameRow(src, dest) ||
+        isSameColumn(src, dest) ||
+        isSameDiagonal(src, dest)
+      )
+    ) {
+      return false;
     }
 
-    isMovePossible(src, dest, squares) {
-        return isPathClean(this.getSrcToDestPath(src, dest), squares) && (isSameDiagonal(src, dest) || isSameRow(src, dest) || isSameColumn(src, dest));
+    // Get the path between src and dest
+    const path = this.getSrcToDestPath(src, dest);
+
+    // Check if the path is clear
+    return isPathClean(path, squares);
+  }
+
+  /**
+   * Dynamically calculates the path between src and dest (exclusive)
+   * @param {number} src - Source square index (0-63)
+   * @param {number} dest - Destination square index (0-63)
+   * @returns {number[]} - Array of square indices between src and dest
+   */
+  getSrcToDestPath(src, dest) {
+    const path = [];
+    const rowSrc = Math.floor(src / 8);
+    const colSrc = src % 8;
+    const rowDest = Math.floor(dest / 8);
+    const colDest = dest % 8;
+
+    const rowStep = rowDest > rowSrc ? 1 : rowDest < rowSrc ? -1 : 0;
+    const colStep = colDest > colSrc ? 1 : colDest < colSrc ? -1 : 0;
+
+    let current = src + rowStep * 8 + colStep;
+
+    while (current !== dest) {
+      path.push(current);
+      current += rowStep * 8 + colStep;
     }
 
-    /**
-     * get path between src and dest (src and dest exclusive)
-     * @param  {num} src  
-     * @param  {num} dest 
-     * @return {[array]}      
-     */
-    getSrcToDestPath(src, dest) {
-        let path = [], pathStart, pathEnd, incrementBy;
-        if (src > dest) {
-            pathStart = dest;
-            pathEnd = src;
-        }
-        else {
-            pathStart = src;
-            pathEnd = dest;
-        }
-        if (Math.abs(src - dest) % 8 === 0) {
-            incrementBy = 8;
-            pathStart += 8;
-        }
-        else if (Math.abs(src - dest) % 9 === 0) {
-            incrementBy = 9;
-            pathStart += 9;
-        }
-        else if (Math.abs(src - dest) % 7 === 0) {
-            incrementBy = 7;
-            pathStart += 7;
-        }
-        else {
-            incrementBy = 1;
-            pathStart += 1;
-        }
-
-        for (let i = pathStart; i < pathEnd; i += incrementBy) {
-            path.push(i);
-        }
-        return path;
-    }
+    return path;
+  }
 }

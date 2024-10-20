@@ -1,38 +1,58 @@
-import React from 'react';
-import '../index.css';
-import Square from './square.js';
+// src/components/Board.js
+import React from "react";
+import { Grid } from "@mui/material";
+import Square from "./Square";
 
-export default class Board extends React.Component {
+const Board = ({ squares, onClick, selectedSquare }) => {
+  const renderSquare = (i, shade) => {
+    const isSelected = i === selectedSquare;
+    return (
+      <Square
+        key={i}
+        keyVal={i}
+        style={squares[i] ? squares[i].style : null}
+        shade={shade}
+        onClick={() => onClick(i)}
+        isSelected={isSelected}
+      />
+    );
+  };
 
-    renderSquare(i, squareShade) {
-        return <Square
-            key={i}
-            keyVal={i}
-            style={this.props.squares[i] ? this.props.squares[i].style : null}
-            shade={squareShade}
-            onClick={() => this.props.onClick(i)}
-        />
+  const boardRows = [];
+  for (let row = 0; row < 8; row++) {
+    const squaresInRow = [];
+    for (let col = 0; col < 8; col++) {
+      const index = row * 8 + col;
+      const isLight = (row + col) % 2 === 0;
+      const shade = isLight ? "light-square" : "dark-square";
+      squaresInRow.push(renderSquare(index, shade));
     }
+    boardRows.push(
+      <Grid container key={row} spacing={0}>
+        {squaresInRow}
+      </Grid>
+    );
+  }
 
-    render() {
-        const board = [];
-        for (let i = 0; i < 8; i++) {
-            const squareRows = [];
-            for (let j = 0; j < 8; j++) {
-                const squareShade = (isEven(i) && isEven(j)) || (!isEven(i) && !isEven(j)) ? "light-square" : "dark-square";
-                squareRows.push(this.renderSquare((i * 8) + j, squareShade));
-            }
-            board.push(<div className="board-row" key={i}>{squareRows}</div>)
-        }
+  return (
+    <Grid
+      container
+      direction="column"
+      sx={{
+        border: "1px solid #000",
+        width: "32.15rem",
+        height: "30rem",
+        padding: 0,
+        margin: 0,
+        "@media (max-width:600px)": {
+          maxWidth: "22.5rem",
+          maxHeight: "20rem",
+        },
+      }}
+    >
+      {boardRows}
+    </Grid>
+  );
+};
 
-        return (
-            <div>
-                {board}
-            </div>
-        );
-    }
-}
-
-function isEven(num) {
-    return num % 2 === 0
-}
+export default Board;
