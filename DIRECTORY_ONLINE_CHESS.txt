@@ -2,6 +2,7 @@
 ├── DIRECTORY_ONLINE_CHESS.txt
 ├── app.js
 ├── client
+│   ├── DIRECTORY_ONLINE_CHESS.txt
 │   ├── README.md
 │   ├── package-lock.json
 │   ├── package.json
@@ -14,17 +15,16 @@
 │       ├── App.js
 │       ├── chess-logo.png
 │       ├── components
-│       │   ├── board.js
-│       │   ├── fallen-soldier-block.js
-│       │   └── square.js
-│       ├── dictionaries
-│       │   ├── column.json
-│       │   ├── diagonalTopLeftBottomRight.json
-│       │   ├── diagonalTopRightBottomLeft.json
-│       │   └── row.json
+│       │   ├── Board.js
+│       │   ├── FallenSoldierBlock.js
+│       │   ├── Game.js
+│       │   └── Square.js
 │       ├── helpers
+│       │   ├── ConfirmationDialog.js
 │       │   ├── board-initialiser.js
-│       │   └── index.js
+│       │   ├── deserializeSquares.js
+│       │   ├── index.js
+│       │   └── resetGame.js
 │       ├── index.css
 │       ├── index.js
 │       └── pieces
@@ -38,4 +38,4 @@
 ├── package-lock.json
 └── package.json
 
-8 directories, 31 files
+7 directories, 32 files
