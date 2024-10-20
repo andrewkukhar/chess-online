@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "online chess multiplayer",
   "main": "app.js",
+  "engines": {
+    "node": "18.x"
+  },
   "scripts": {
     "heroku-postbuild": "cd client && npm install && npm run build",
     "start": "node app.js",
@@ -38,6 +41,7 @@
     "socket.io-client": "^4.5.3"
   },
   "devDependencies": {
+    "concurrently": "^9.0.1",
     "nodemon": "^2.0.20"
   }
 }
