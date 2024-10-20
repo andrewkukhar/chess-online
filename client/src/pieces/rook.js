@@ -10,6 +10,8 @@ export default class Rook extends Piece {
         ? "https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg"
         : "https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg"
     );
+    this.player = player;
+    this.type = "Rook";
   }
 
   isMovePossible(src, dest, squares) {

@@ -10,6 +10,8 @@ import { deserializeSquares } from "../helpers/deserializeSquares";
 import { resetGame } from "../helpers/resetGame";
 import ConfirmationDialog from "../helpers/ConfirmationDialog";
 
+const VALID_PIECE_TYPES = ["King", "Queen", "Bishop", "Knight", "Rook", "Pawn"];
+
 const Game = () => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [history, setHistory] = useState([]);
@@ -19,7 +21,13 @@ const Game = () => {
       try {
         const parsedState = JSON.parse(savedState);
         const deserialized = deserializeSquares(parsedState.squares);
-        if (Array.isArray(deserialized) && deserialized.length === 64) {
+        if (
+          Array.isArray(deserialized) &&
+          deserialized.length === 64 &&
+          deserialized.every(
+            (piece) => piece === null || VALID_PIECE_TYPES.includes(piece.type)
+          )
+        ) {
           return deserialized;
         } else {
           console.warn("Invalid deserialized squares. Initializing new board.");
@@ -189,7 +197,7 @@ const Game = () => {
     return squares?.map((piece) => {
       if (!piece) return null;
       return {
-        type: piece.constructor.name,
+        type: piece.type,
         player: piece.player,
       };
     });
@@ -237,15 +245,19 @@ const Game = () => {
   };
 
   useEffect(() => {
-    const serializedState = {
-      squares: serializeSquares(squares),
-      whiteFallenSoldiers,
-      blackFallenSoldiers,
-      player,
-      turn,
-      status,
-    };
-    localStorage.setItem("chessGameState", JSON.stringify(serializedState));
+    try {
+      const serializedState = {
+        squares: serializeSquares(squares),
+        whiteFallenSoldiers,
+        blackFallenSoldiers,
+        player,
+        turn,
+        status,
+      };
+      localStorage.setItem("chessGameState", JSON.stringify(serializedState));
+    } catch (error) {
+      console.error("Failed to save chess game state:", error);
+    }
   }, [squares, whiteFallenSoldiers, blackFallenSoldiers, player, turn, status]);
 
   return (

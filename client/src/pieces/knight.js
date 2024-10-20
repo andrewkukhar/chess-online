@@ -9,6 +9,8 @@ export default class Knight extends Piece {
         ? "https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg"
         : "https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg"
     );
+    this.player = player;
+    this.type = "Knight";
   }
 
   isMovePossible(src, dest, squares) {

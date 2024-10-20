@@ -9,6 +9,8 @@ export default class King extends Piece {
         ? "https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg"
         : "https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg"
     );
+    this.player = player;
+    this.type = "King";
   }
 
   isMovePossible(src, dest, squares) {

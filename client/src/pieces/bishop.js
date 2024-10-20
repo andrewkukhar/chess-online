@@ -10,6 +10,8 @@ export default class Bishop extends Piece {
         ? "https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg"
         : "https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg"
     );
+    this.player = player;
+    this.type = "Bishop";
   }
 
   isMovePossible(src, dest, squares) {
