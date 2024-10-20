@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Tooltip, IconButton } from "@mui/material";
 import { Restore, Undo } from "@mui/icons-material";
-import Board from "./Board";
+import BoardComponent from "./BoardComponent";
 import FallenSoldierBlock from "./FallenSoldierBlock";
 import initialiseChessBoard from "../helpers/board-initialiser";
 import King from "../pieces/king";
@@ -337,7 +337,7 @@ const Game = () => {
           margin: 0,
         }}
       >
-        <Board
+        <BoardComponent
           squares={squares}
           onClick={handleClick}
           selectedSquare={selectedSquare}
