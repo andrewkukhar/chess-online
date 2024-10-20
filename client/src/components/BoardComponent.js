@@ -1,13 +1,13 @@
 // src/components/Board.js
 import React from "react";
 import { Grid } from "@mui/material";
-import Square from "./Square";
+import SquareElement from "./SquareElement";
 
 const BoardComponent = ({ squares, onClick, selectedSquare }) => {
   const renderSquare = (i, shade) => {
     const isSelected = i === selectedSquare;
     return (
-      <Square
+      <SquareElement
         key={i}
         keyVal={i}
         style={squares[i] ? squares[i].style : null}
