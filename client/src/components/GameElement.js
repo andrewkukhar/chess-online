@@ -261,17 +261,7 @@ const Game = () => {
   }, [squares, whiteFallenSoldiers, blackFallenSoldiers, player, turn, status]);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        background: "linear-gradient(0deg, #4b79a1 0%, #283e51 100%)",
-        minHeight: "100vh",
-        padding: 2,
-        color: "#fff",
-      }}
-    >
+    <div className="game">
       <Box
         sx={{
           margin: "0.5rem 1rem",
@@ -309,7 +299,6 @@ const Game = () => {
           </IconButton>
         </Tooltip>
       </Box>
-
       <Box
         sx={{
           width: "100%",
@@ -344,24 +333,11 @@ const Game = () => {
           </Typography>
         </Box>
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "100%",
-          height: "100%",
-          maxWidth: "33rem",
-          padding: 0,
-          margin: 0,
-        }}
-      >
-        <BoardComponent
-          squares={squares}
-          onClick={handleClick}
-          selectedSquare={selectedSquare}
-        />
-      </Box>
+      <BoardComponent
+        squares={squares}
+        onClick={handleClick}
+        selectedSquare={selectedSquare}
+      />
       <Box sx={{ width: "100%", maxWidth: "20rem", marginTop: 4 }}>
         <FallenSoldierBlock
           whiteFallenSoldiers={whiteFallenSoldiers}
@@ -377,7 +353,7 @@ const Game = () => {
         confirmText="Restart"
         cancelText="Cancel"
       />
-    </Box>
+    </div>
   );
 };
 
