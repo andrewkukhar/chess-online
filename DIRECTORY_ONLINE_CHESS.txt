@@ -12,13 +12,14 @@
 │   │   ├── index.html
 │   │   └── robots.txt
 │   └── src
+│       ├── App.css
 │       ├── App.js
 │       ├── chess-logo.png
 │       ├── components
-│       │   ├── Board.js
+│       │   ├── BoardComponent.js
 │       │   ├── FallenSoldierBlock.js
-│       │   ├── Game.js
-│       │   └── Square.js
+│       │   ├── GameElement.js
+│       │   └── SquareElement.js
 │       ├── helpers
 │       │   ├── ConfirmationDialog.js
 │       │   ├── board-initialiser.js
@@ -38,4 +39,4 @@
 ├── package-lock.json
 └── package.json
 
-7 directories, 32 files
+7 directories, 33 files

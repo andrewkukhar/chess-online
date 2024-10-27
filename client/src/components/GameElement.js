@@ -1,6 +1,13 @@
 // src/components/Game.js
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Tooltip, IconButton } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Tooltip,
+  IconButton,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { Restore, Undo } from "@mui/icons-material";
 import BoardComponent from "./BoardComponent";
 import FallenSoldierBlock from "./FallenSoldierBlock";
@@ -85,6 +92,16 @@ const Game = () => {
   });
   const [selectedSquare, setSelectedSquare] = useState(null);
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
+
+  const showSnackbar = (message, severity = "info") => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const handleClick = (i) => {
     setHistory((prevHistory) => [
       ...prevHistory,
@@ -104,23 +121,25 @@ const Game = () => {
 
     if (selectedSquare === null) {
       if (!clickedPiece || clickedPiece.player !== player) {
-        setStatus(`Wrong selection. Choose player ${player} pieces.`);
+        showSnackbar(
+          `Wrong selection. Choose player ${player} pieces.`,
+          "error"
+        );
       } else {
         setSelectedSquare(i);
-        setStatus("Choose destination for the selected piece");
+        showSnackbar("Piece selected. Choose destination.", "info");
       }
       return;
     }
 
     if (i === selectedSquare) {
       setSelectedSquare(null);
-      setStatus("");
       return;
     }
 
     if (clickedPiece && clickedPiece.player === player) {
       setSelectedSquare(i);
-      setStatus("Choose destination for the selected piece");
+      showSnackbar("Piece selected. Choose destination.", "info");
       return;
     }
 
@@ -149,9 +168,11 @@ const Game = () => {
 
       const isCheckMe = isCheckForPlayer(newSquares, player);
       if (isCheckMe) {
-        setStatus(
-          "Wrong. Choose valid source/destination. Now you have a check!"
+        showSnackbar(
+          "Check! Choose a valid move to protect your King.",
+          "warning"
         );
+
         setSelectedSquare(null);
       } else {
         const nextPlayer = player === 1 ? 2 : 1;
@@ -163,10 +184,14 @@ const Game = () => {
         setTurn(nextTurn);
         setStatus("");
         setSelectedSquare(null);
+        showSnackbar(
+          `${nextTurn.charAt(0).toUpperCase() + nextTurn.slice(1)}'s turn`,
+          "success"
+        );
       }
     } else {
-      setStatus("Wrong selection. Choose valid source and destination again.");
       setSelectedSquare(null);
+      showSnackbar("Invalid move. Please try again.", "error");
     }
   };
 
@@ -179,6 +204,7 @@ const Game = () => {
   const isCheckForPlayer = (squares, player) => {
     const opponent = player === 1 ? 2 : 1;
     const kingPos = getKingPosition(squares, player);
+
     if (kingPos === -1) return false;
 
     for (let idx = 0; idx < squares.length; idx++) {
@@ -219,6 +245,7 @@ const Game = () => {
     });
     setHistory([]);
     setOpenConfirm(false);
+    showSnackbar("Game has been reset.", "info");
   };
 
   const handleCancelReset = () => {
@@ -227,7 +254,7 @@ const Game = () => {
 
   const handleUndo = () => {
     if (history.length === 0) {
-      setStatus("No moves to undo.");
+      showSnackbar("No moves to undo.", "info");
       return;
     }
 
@@ -240,8 +267,15 @@ const Game = () => {
     setTurn(lastState.turn);
     setStatus(lastState.status);
     setSelectedSquare(lastState.selectedSquare);
-
     setHistory(history.slice(0, history.length - 1));
+    showSnackbar("Last move undone.", "info");
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
   };
 
   useEffect(() => {
@@ -302,36 +336,28 @@ const Game = () => {
       <Box
         sx={{
           width: "100%",
-          maxWidth: "22.5rem",
-          minHeight: "7rem",
-          margin: "1rem 0",
+          margin: "0.5rem 0",
+          padding: "0.5rem 0",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          alignItems: "center",
         }}
       >
-        <Typography variant="h5" mb={2}>
-          Turn/Next: {turn.charAt(0).toUpperCase() + turn.slice(1)}
+        <Typography variant="h5">
+          {`Turn/Next: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`}
         </Typography>
         <Box
           sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mb: 1,
+            width: 32,
+            height: 32,
+            backgroundColor: turn,
+            border: "1px solid #000",
+            margin: "0.5rem 0.75rem",
+            padding: "0",
+            textAlign: "center",
           }}
-        >
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              backgroundColor: turn,
-              border: "1px solid #000",
-              margin: "0 1rem 0 0",
-            }}
-          ></Box>
-          <Typography variant="body1" sx={{ fontSize: "0.85rem", m: 0, p: 0 }}>
-            {status}
-          </Typography>
-        </Box>
+        ></Box>
       </Box>
       <BoardComponent
         squares={squares}
@@ -353,6 +379,20 @@ const Game = () => {
         confirmText="Restart"
         cancelText="Cancel"
       />
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3500}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
