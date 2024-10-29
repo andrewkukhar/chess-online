@@ -1,6 +1,28 @@
 // models/Move.js
 const mongoose = require("mongoose");
 
+const CapturedPieceSchema = new mongoose.Schema(
+  {
+    player: {
+      type: Number,
+      required: true,
+    },
+    style: {
+      type: Object, // Or define a more specific schema if needed
+      required: true,
+    },
+    initialPositions: {
+      type: Object, // Define structure as needed
+      required: false,
+    },
+    type: {
+      type: String,
+      required: true,
+    },
+  },
+  { _id: false }
+);
+
 const MoveSchema = new mongoose.Schema({
   game: {
     type: mongoose.Schema.Types.ObjectId,
@@ -25,7 +47,7 @@ const MoveSchema = new mongoose.Schema({
     required: true,
   },
   captured: {
-    type: String,
+    type: CapturedPieceSchema,
     default: null,
   },
   timestamp: {

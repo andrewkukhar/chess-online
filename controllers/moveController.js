@@ -4,6 +4,21 @@ const Move = require("../models/Move");
 const Game = require("../models/Game");
 const socket = require("../socket");
 const io = socket.getIO();
+const {
+  PIECE_TYPES,
+  reconstructBoard,
+  isMovePossibleInternal,
+  isPawnMovePossible,
+  isKnightMovePossible,
+  isBishopMovePossible,
+  isRookMovePossible,
+  isKingMovePossible,
+  validateMove,
+  indexToAlgebraic,
+  hasAnyLegalMoves,
+  initialiseChessBoard,
+  isKingInCheck,
+} = require("./moveHelpers");
 
 /**
  * Make a move in a game.
@@ -23,7 +38,8 @@ exports.makeMove = async (req, res) => {
     typeof move !== "object" ||
     typeof move.from !== "number" ||
     typeof move.to !== "number" ||
-    typeof move.piece !== "string"
+    typeof move.piece !== "string" ||
+    !PIECE_TYPES.includes(move.piece)
   ) {
     return res.status(400).json({ message: "Invalid move data." });
   }
@@ -46,39 +62,75 @@ exports.makeMove = async (req, res) => {
         .json({ message: "You are not a player in this game." });
     }
 
-    const currentTurnPlayer = game.moves.length % 2 === 0 ? "white" : "black";
     const userColor =
       game.players[0]._id.toString() === userId ? "white" : "black";
+    const playerNumber = userColor === "white" ? 1 : 2;
+
+    // Determine current turn
+    const currentTurnPlayer = game.moves.length % 2 === 0 ? "white" : "black";
 
     if (userColor !== currentTurnPlayer) {
       return res.status(400).json({ message: "It's not your turn." });
     }
 
-    // TODO: Add game logic to validate the move (e.g., chess rules)
+    const currentBoard = reconstructBoard(game.moves);
+    const isValid = validateMove(currentBoard, move, playerNumber);
+    if (!isValid) {
+      return res
+        .status(400)
+        .json({ message: "Invalid move according to chess rules." });
+    }
+
+    let capturedData = null;
+    if (move.captured) {
+      capturedData = {
+        player: move.captured.player,
+        style: move.captured.style,
+        initialPositions: move.captured.initialPositions || {},
+        type: move.captured.type,
+      };
+    }
 
     const newMove = new Move({
-      game: mongoose.Types.ObjectId(gameId),
-      player: mongoose.Types.ObjectId(userId),
+      game: gameId,
+      player: userId,
       from: move.from,
       to: move.to,
       piece: move.piece.trim(),
-      captured: move.captured ? move.captured.trim() : null,
+      captured: capturedData,
     });
 
     await newMove.save();
 
-    // Add move to the game
     game.moves.push(newMove._id);
+    await game.save();
+
+    await game.populate("moves");
+
+    const updatedBoard = reconstructBoard(game.moves);
+    if (isKingInCheck(updatedBoard, playerNumber)) {
+      const opponentNumber = playerNumber === 1 ? 2 : 1;
+      const opponentInCheck = isKingInCheck(updatedBoard, opponentNumber);
+      if (opponentInCheck) {
+        const hasLegalMoves = hasAnyLegalMoves(updatedBoard, opponentNumber);
+        if (!hasLegalMoves) {
+          game.status = "checkmate";
+        }
+      }
+    }
 
     await game.save();
+
+    const updatedPlayerTurn = game.moves.length % 2 === 0 ? "white" : "black";
 
     game.players.forEach((player) => {
       const socketId = socket.getUserSocketId(player._id.toString());
       if (socketId) {
         io.to(socketId).emit("newMove", {
-          gameId: newGame._id,
+          gameId: game._id,
           moveId: newMove._id,
-          game: newGame,
+          game: game,
+          playerTurn: updatedPlayerTurn,
         });
       }
     });

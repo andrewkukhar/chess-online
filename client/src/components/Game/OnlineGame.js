@@ -1,10 +1,7 @@
 // src/components/OnlineGame.js
 import React, { useState, useEffect, useContext } from "react";
-import { useParams } from "react-router-dom";
-import {
-  useMakeMoveMutation,
-  useUndoMoveMutation,
-} from "../../services/api-services/move";
+import { useParams, useNavigate } from "react-router-dom";
+import { useMakeMoveMutation } from "../../services/api-services/move";
 import { useGetAllMovesQuery } from "../../services/api-services/move";
 import { useGetGameQuery } from "../../services/api-services/game";
 import {
@@ -15,8 +12,9 @@ import {
   Snackbar,
   Alert,
   Button,
+  CircularProgress,
 } from "@mui/material";
-import { Restore, Undo } from "@mui/icons-material";
+import { Restore } from "@mui/icons-material";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useSocket } from "../../contexts/SocketContext";
 import BoardComponent from "../GameElements/BoardComponent";
@@ -27,6 +25,8 @@ import ConfirmationDialog from "../../helpers/ConfirmationDialog";
 
 const OnlineGame = () => {
   const { gameId: paramGameId } = useParams();
+  const navigate = useNavigate();
+
   const { socket } = useSocket();
   const { userId } = useContext(AuthContext);
 
@@ -45,17 +45,21 @@ const OnlineGame = () => {
   const [openConfirm, setOpenConfirm] = useState(false);
 
   // RTK Query Hooks
-  const { data: gameData } = useGetGameQuery(gameId, {
+  const {
+    data: gameData,
+    isLoading: gameLoading,
+    refetch: refetchGameData,
+  } = useGetGameQuery(gameId, {
     skip: !gameId,
   });
-  const { data: movesData, refetch: refetchMoves } = useGetAllMovesQuery(
-    gameId,
-    {
-      skip: !gameId,
-    }
-  );
+  const {
+    data: movesData,
+    refetch: refetchMoves,
+    isLoading: movesLoading,
+  } = useGetAllMovesQuery(gameId, {
+    skip: !gameId,
+  });
   const [makeMove] = useMakeMoveMutation();
-  const [undoMove] = useUndoMoveMutation();
 
   // Local State
   const [squares, setSquares] = useState(() => initialiseChessBoard());
@@ -69,21 +73,28 @@ const OnlineGame = () => {
       localStorage.setItem("currentGameId", paramGameId);
     } else {
       const storedGameId = localStorage.getItem("currentGameId");
+
       if (storedGameId) {
         setGameId(storedGameId);
+      } else {
+        navigate("/online");
       }
     }
-  }, [paramGameId]);
+  }, [paramGameId, navigate]);
 
   useEffect(() => {
     if (gameData && gameData.players) {
+      // console.log("Game Data:", gameData);
+      // console.log("Number of Moves:", gameData.moves.length);
       const playerIndex = gameData.players.findIndex(
         (player) => player._id === userId
       );
       const color = playerIndex === 0 ? "white" : "black";
       setPlayerColor(color);
       setIsHost(playerIndex === 0);
-      setPlayerTurn(gameData.moves.length % 2 === 0 ? "white" : "black");
+      const turn = gameData.moves.length % 2 === 0 ? "white" : "black";
+      // console.log("Next Player Turn:", turn);
+      setPlayerTurn(turn);
     }
   }, [gameData, userId]);
 
@@ -101,12 +112,15 @@ const OnlineGame = () => {
         initialBoard[from] = null;
 
         if (captured) {
-          const capturedPiece = captured.toLowerCase(); // Assuming 'piece' indicates the type
+          const { player, style, initialPositions, type } = captured;
+
           const fallenPiece = {
-            type:
-              capturedPiece.charAt(0).toUpperCase() + capturedPiece.slice(1),
-            style: initialBoard[to].style, // Adjust as needed
+            player,
+            style,
+            initialPositions,
+            type: type.charAt(0).toUpperCase() + type.slice(1),
           };
+
           if (initialBoard[to].player === 1) {
             fallenBlack.push(fallenPiece);
           } else {
@@ -131,30 +145,18 @@ const OnlineGame = () => {
           message: "A new move has been made.",
           severity: "info",
         });
+        setPlayerTurn(data.playerTurn);
         refetchMoves();
-      }
-    };
-
-    const handleMoveUndone = (data) => {
-      if (data.gameId === gameId) {
-        setSnackbarAlert({
-          open: true,
-          message: "A move has been undone.",
-          severity: "info",
-        });
-
-        refetchMoves();
+        refetchGameData();
       }
     };
 
     socket.on("newMove", handleNewMove);
-    socket.on("moveUndone", handleMoveUndone);
 
     return () => {
       socket.off("newMove", handleNewMove);
-      socket.off("moveUndone", handleMoveUndone);
     };
-  }, [socket, gameId, refetchMoves]);
+  }, [socket, gameId, refetchMoves, refetchGameData]);
 
   const handleResetGame = () => {
     setOpenConfirm(true);
@@ -198,46 +200,17 @@ const OnlineGame = () => {
       move: { from, to, piece: piece?.type, captured },
     });
 
-    if (result?.data && result?.data?.game) {
+    if (result?.data && result?.data?.move) {
       setSnackbarAlert({
         open: true,
         message: result?.data?.message || `Move has been made!`,
         severity: "success",
       });
-      // localStorage.setItem("currentGameId", result?.data?.game?._id);
     } else {
       console.log("Error result:", result);
       setSnackbarAlert({
         open: true,
         message: result?.error?.data?.message || `Failed to make move.`,
-        severity: "error",
-      });
-    }
-  };
-
-  const handleUndo = async () => {
-    if (!socket) {
-      setSnackbarAlert({
-        open: true,
-        message: "Socket not connected. Please try again later.",
-        severity: "error",
-      });
-      return;
-    }
-    const result = await undoMove({ gameId });
-
-    if (result?.data && result?.data?.game) {
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || `Move has been undone!`,
-        severity: "success",
-      });
-      // localStorage.setItem("currentGameId", result?.data?.game?._id);
-    } else {
-      console.log("Error result:", result);
-      setSnackbarAlert({
-        open: true,
-        message: result?.error?.data?.message || `Failed to undo move.`,
         severity: "error",
       });
     }
@@ -283,7 +256,16 @@ const OnlineGame = () => {
 
     if (isMovePossible) {
       const capturedPiece = squares[i];
-      handleMove(selectedSquare, i, sourcePiece, capturedPiece);
+      const capturedData = capturedPiece
+        ? {
+            player: capturedPiece.player,
+            style: capturedPiece.style,
+            initialPositions: capturedPiece.initialPositions,
+            type: capturedPiece.type,
+          }
+        : null;
+      console.log("capturedData", capturedData);
+      handleMove(selectedSquare, i, sourcePiece, capturedData);
       setSelectedSquare(null);
     } else {
       setSelectedSquare(null);
@@ -299,6 +281,21 @@ const OnlineGame = () => {
     if (reason === "clickaway") return;
     setSnackbarAlert({ open: false, message: "", severity: "info" });
   };
+
+  if (gameLoading || movesLoading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "100vh",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <div className="game">
@@ -343,21 +340,6 @@ const OnlineGame = () => {
             gap: "1rem",
           }}
         >
-          <Tooltip title="Undo Last Move" placement="left">
-            <IconButton
-              onClick={handleUndo}
-              sx={{
-                p: 1,
-                background: "#20927B",
-                "&:hover": {
-                  background: "#59C8B2",
-                },
-              }}
-              disabled={playerTurn !== playerColor}
-            >
-              <Undo />
-            </IconButton>
-          </Tooltip>
           <Tooltip title="Restart The Game" placement="right">
             <IconButton
               onClick={handleResetGame}

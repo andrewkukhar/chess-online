@@ -19,18 +19,14 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  console.log("userId", userId);
-  console.log("token", token);
-  console.log("isTokenReady", isTokenReady);
 
   const {
     data: gamesData,
     isLoading,
     isError,
   } = useGetAllGamesQuery(undefined, {
-    skip: !isTokenReady,
+    skip: !isTokenReady || !userId | !token,
   });
-  console.log("gamesData", gamesData);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);

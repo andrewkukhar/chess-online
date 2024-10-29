@@ -26,7 +26,7 @@ let corsOptions = {
   },
   credentials: true,
 };
-// routes import
+// Import routes
 const authRoutes = require("./routes/auth");
 const gameRoutes = require("./routes/game");
 const moveRoutes = require("./routes/move");
@@ -35,13 +35,14 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/api/auth", authRoutes);
+app.use("/api/games", gameRoutes);
+app.use("/api/moves", moveRoutes);
+
 app.use("/", express.static(path.join(__dirname, "client", "build")));
 app.get("*", (req, res) => {
   res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
 });
-app.use("/api/auth", authRoutes);
-app.use("/api/games", gameRoutes);
-app.use("/api/moves", moveRoutes);
 
 const PORT = process.env.PORT || 5000;
 

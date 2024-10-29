@@ -19,7 +19,7 @@ const GameSchema = new mongoose.Schema({
   ],
   status: {
     type: String,
-    enum: ["waiting", "ongoing", "finished"],
+    enum: ["waiting", "ongoing", "finished", "checkmate", "check"],
     default: "waiting",
   },
   createdAt: {

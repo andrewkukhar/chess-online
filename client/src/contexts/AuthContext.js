@@ -13,14 +13,23 @@ export const AuthProvider = ({ children }) => {
   );
 
   const [isTokenReady, setIsTokenReady] = useState(false);
+  const [isCheckingToken, setIsCheckingToken] = useState(true);
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-      setIsTokenReady(true);
-    } else {
-      setIsTokenReady(false);
-    }
+    const verifyToken = () => {
+      if (token) {
+        if (isTokenExpired(token)) {
+          handleLogout();
+        } else {
+          setIsTokenReady(true);
+        }
+      } else {
+        setIsTokenReady(false);
+      }
+      setIsCheckingToken(false);
+    };
+    if (token) verifyToken();
+
     if (userId) localStorage.setItem("userId", userId);
     if (username) localStorage.setItem("username", username);
   }, [token, userId, username]);
@@ -30,6 +39,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUserId(null);
     setUsername(null);
+    setIsTokenReady(false);
 
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
@@ -52,6 +62,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("token", token);
     localStorage.setItem("userId", userId);
     localStorage.setItem("username", username);
+    setIsTokenReady(true);
   };
 
   return (
@@ -61,6 +72,7 @@ export const AuthProvider = ({ children }) => {
         userId,
         username,
         isTokenReady,
+        isCheckingToken,
         handleLogin,
         handleLogout,
       }}

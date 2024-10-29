@@ -120,7 +120,7 @@ exports.joinGame = async (req, res) => {
     }
 
     // Check if user is already a player in the game
-    if (game.players.includes(mongoose.Types.ObjectId(playerId))) {
+    if (game.players.includes(playerId)) {
       return res.status(400).json({ message: "You are already in this game." });
     }
 
@@ -130,7 +130,7 @@ exports.joinGame = async (req, res) => {
     }
 
     // Add user to the game
-    game.players.push(mongoose.Types.ObjectId(playerId));
+    game.players.push(playerId);
 
     // Update game status if two players are present
     if (game.players.length === 2) {
@@ -297,17 +297,17 @@ exports.getGame = async (req, res) => {
 };
 
 /**
- * Get all games
+ * Get all games that belong to the authenticated user.
  * @route GET /api/games/get-all-games
  * @access Private
  */
 exports.getAllGames = async (req, res) => {
   const userId = req.user.userId;
-  console.log("userId", userId);
+  // console.log("userId", userId);
 
-  // if (!mongoose.Types.ObjectId.isValid(userId)) {
-  //   return res.status(400).json({ message: "Invalid user ID." });
-  // }
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid user ID." });
+  }
   try {
     const games = await Game.find({ players: userId })
       .populate("players")
@@ -316,10 +316,12 @@ exports.getAllGames = async (req, res) => {
         populate: { path: "player" },
       })
       .sort({ createdAt: -1 });
-    console.log("games", games);
 
-    if (!games) {
-      return res.status(404).json({ message: "Games not found." });
+    if (!games || games.length === 0) {
+      return res.status(200).json({
+        message: "No games found for the authenticated user.",
+        games: [],
+      });
     }
 
     res.status(200).json(games);

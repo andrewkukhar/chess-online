@@ -60,15 +60,12 @@ export const gameApi = createApi({
       providesTags: (result, error, gameId) => [{ type: "Game", id: gameId }],
     }),
     getAllGames: builder.query({
-      query: () => "get-all-games",
-      // skip: (userId) => !userId,
-      providesTags: (result) =>
-        result
-          ? [
-              ...result.map(({ _id }) => ({ type: "Game", id: _id })),
-              { type: "Game", id: "LIST" },
-            ]
-          : [{ type: "Game", id: "LIST" }],
+      query: () => ({
+        url: `get-all-games`,
+        method: "GET",
+      }),
+      skip: (userId) => !userId,
+      providesTags: (result, error, gameId) => [{ type: "Game", id: gameId }],
     }),
   }),
 });

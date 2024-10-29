@@ -34,7 +34,7 @@ export const moveApi = createApi({
       providesTags: (result, error, moveId) => [{ type: "Move", id: moveId }],
     }),
     getAllMoves: builder.query({
-      query: ({ gameId }) => ({
+      query: (gameId) => ({
         url: `get-game-moves/${gameId}`,
         method: "GET",
       }),
