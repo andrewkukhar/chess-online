@@ -9,17 +9,17 @@ import {
   Alert,
 } from "@mui/material";
 import { Restore, Undo } from "@mui/icons-material";
-import BoardComponent from "./BoardComponent";
-import FallenSoldierBlock from "./FallenSoldierBlock";
-import initialiseChessBoard from "../helpers/board-initialiser";
-import King from "../pieces/king";
-import { deserializeSquares } from "../helpers/deserializeSquares";
-import { resetGame } from "../helpers/resetGame";
-import ConfirmationDialog from "../helpers/ConfirmationDialog";
+import BoardComponent from "../GameElements/BoardComponent";
+import FallenSoldierBlock from "../GameElements/FallenSoldierBlock";
+import initialiseChessBoard from "../../helpers/board-initialiser";
+import King from "../../pieces/king";
+import { deserializeSquares } from "../../helpers/deserializeSquares";
+import { resetGame } from "../../helpers/resetGame";
+import ConfirmationDialog from "../../helpers/ConfirmationDialog";
 
 const VALID_PIECE_TYPES = ["King", "Queen", "Bishop", "Knight", "Rook", "Pawn"];
 
-const Game = () => {
+const LocalGame = () => {
   const [openConfirm, setOpenConfirm] = useState(false);
   const [history, setHistory] = useState([]);
   const [squares, setSquares] = useState(() => {
@@ -299,39 +299,58 @@ const Game = () => {
       <Box
         sx={{
           margin: "0.5rem 1rem",
+          padding: "0.25rem 2rem",
           display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
           width: "100%",
           gap: "0.5rem",
         }}
       >
-        <Tooltip title="Undo Last Move" placement="left">
-          <IconButton
-            onClick={handleUndo}
-            sx={{
-              p: 1,
-              background: "#20927B",
-              "&:hover": {
-                background: "#59C8B2",
-              },
-            }}
-          >
-            <Undo />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Restart The Game" placement="right">
-          <IconButton
-            onClick={handleResetGame}
-            sx={{
-              p: 1,
-              background: "#B13333",
-              "&:hover": {
-                background: "#B47272",
-              },
-            }}
-          >
-            <Restore />
-          </IconButton>
-        </Tooltip>
+        <Typography variant="h4" mr={3}>
+          Local Game
+        </Typography>
+        <Box
+          sx={{
+            margin: "0.5rem",
+            padding: "0.25rem",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "1rem",
+          }}
+        >
+          <Tooltip title="Undo Last Move" placement="left">
+            <IconButton
+              onClick={handleUndo}
+              sx={{
+                p: 1,
+                background: "#20927B",
+                "&:hover": {
+                  background: "#59C8B2",
+                },
+              }}
+            >
+              <Undo />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Restart The Game" placement="right">
+            <IconButton
+              onClick={handleResetGame}
+              sx={{
+                p: 1,
+                background: "#B13333",
+                "&:hover": {
+                  background: "#B47272",
+                },
+              }}
+            >
+              <Restore />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
       <Box
         sx={{
@@ -397,4 +416,4 @@ const Game = () => {
   );
 };
 
-export default Game;
+export default LocalGame;

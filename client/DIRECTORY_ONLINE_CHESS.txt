@@ -9,25 +9,54 @@
 │   ├── index.html
 │   └── robots.txt
 └── src
+    ├── App.css
     ├── App.js
     ├── chess-logo.png
     ├── components
-    │   ├── Board.js
-    │   ├── FallenSoldierBlock.js
-    │   ├── Game.js
-    │   └── Square.js
+    │   ├── Authentifications
+    │   │   ├── Login.js
+    │   │   └── Register.js
+    │   ├── Game
+    │   │   ├── CreateGame.js
+    │   │   ├── JoinGame.js
+    │   │   ├── LocalGame.js
+    │   │   └── OnlineGame.js
+    │   ├── GameElements
+    │   │   ├── BoardComponent.js
+    │   │   ├── FallenSoldierBlock.js
+    │   │   └── SquareElement.js
+    │   ├── Navbar.js
+    │   └── OnlineLanding.js
+    ├── contexts
+    │   ├── AuthContext.js
+    │   └── SocketContext.js
     ├── helpers
+    │   ├── ConfirmationDialog.js
     │   ├── board-initialiser.js
-    │   └── index.js
+    │   ├── deserializeSquares.js
+    │   ├── index.js
+    │   └── resetGame.js
     ├── index.css
     ├── index.js
-    └── pieces
-        ├── bishop.js
-        ├── king.js
-        ├── knight.js
-        ├── pawn.js
-        ├── piece.js
-        ├── queen.js
-        └── rook.js
+    ├── pieces
+    │   ├── bishop.js
+    │   ├── king.js
+    │   ├── knight.js
+    │   ├── pawn.js
+    │   ├── piece.js
+    │   ├── queen.js
+    │   └── rook.js
+    ├── services
+    │   ├── api-services
+    │   │   ├── auth.js
+    │   │   ├── game.js
+    │   │   └── move.js
+    │   ├── hooks
+    │   │   └── useSocket.js
+    │   └── redux
+    │       └── store.js
+    └── utils
+        ├── ProtectedRoute.js
+        └── tokenUtils.js
 
-6 directories, 25 files
+15 directories, 45 files

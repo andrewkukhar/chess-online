@@ -16,10 +16,21 @@
 │       ├── App.js
 │       ├── chess-logo.png
 │       ├── components
-│       │   ├── BoardComponent.js
-│       │   ├── FallenSoldierBlock.js
-│       │   ├── GameElement.js
-│       │   └── SquareElement.js
+│       │   ├── Authentifications
+│       │   │   ├── Login.js
+│       │   │   └── Register.js
+│       │   ├── Game
+│       │   │   ├── CreateGame.js
+│       │   │   ├── JoinGame.js
+│       │   │   ├── LocalGame.js
+│       │   │   └── OnlineGame.js
+│       │   ├── GameElements
+│       │   │   ├── BoardComponent.js
+│       │   │   ├── FallenSoldierBlock.js
+│       │   │   └── SquareElement.js
+│       │   └── Navbar.js
+│       ├── contexts
+│       │   └── AuthContext.js
 │       ├── helpers
 │       │   ├── ConfirmationDialog.js
 │       │   ├── board-initialiser.js
@@ -28,15 +39,37 @@
 │       │   └── resetGame.js
 │       ├── index.css
 │       ├── index.js
-│       └── pieces
-│           ├── bishop.js
-│           ├── king.js
-│           ├── knight.js
-│           ├── pawn.js
-│           ├── piece.js
-│           ├── queen.js
-│           └── rook.js
+│       ├── pieces
+│       │   ├── bishop.js
+│       │   ├── king.js
+│       │   ├── knight.js
+│       │   ├── pawn.js
+│       │   ├── piece.js
+│       │   ├── queen.js
+│       │   └── rook.js
+│       ├── services
+│       │   ├── api-services
+│       │   │   └── auth.js
+│       │   ├── hooks
+│       │   │   └── useSocket.js
+│       │   └── redux
+│       │       └── store.js
+│       └── utils
+│           ├── ProtectedRoute.js
+│           └── tokenUtils.js
+├── controllers
+│   └── auth.js
+├── middleware
+│   └── auth.js
+├── models
+│   ├── Game.js
+│   ├── Move.js
+│   └── User.js
+├── mongodb.js
 ├── package-lock.json
-└── package.json
+├── package.json
+├── routes
+│   └── auth.js
+└── socket.js
 
-7 directories, 33 files
+20 directories, 53 files
