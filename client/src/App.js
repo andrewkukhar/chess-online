@@ -12,7 +12,7 @@ import LocalGame from "./components/Game/LocalGame";
 import OnlineGame from "./components/Game/OnlineGame";
 import Login from "./components/Authentifications/Login";
 import Register from "./components/Authentifications/Register";
-import Navbar from "./components/Navbar";
+// import Navbar from "./components/Navbar";
 import OnlineLanding from "./components/OnlineLanding";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import "./App.css";
@@ -21,9 +21,9 @@ const App = () => {
   return (
     <div className="app">
       <Router>
-        <div style={{ width: "100%" }}>
+        {/* <div style={{ width: "100%" }}>
           <Navbar />
-        </div>
+        </div> */}
         <div className="app-body">
           <Routes>
             <Route path="/login" element={<Login />} />
