@@ -15,13 +15,13 @@ import Register from "./components/Authentifications/Register";
 import Navbar from "./components/Navbar";
 import OnlineLanding from "./components/OnlineLanding";
 import ProtectedRoute from "./utils/ProtectedRoute";
-import "./App.css";
+import "./App.scss";
 
 const App = () => {
   return (
     <div className="app">
       <Router>
-        <div style={{ width: "100%" }}>
+        <div className="app-navbar" style={{ width: "100%" }}>
           <Navbar />
         </div>
         <div className="app-body">

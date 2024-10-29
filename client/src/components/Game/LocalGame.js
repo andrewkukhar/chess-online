@@ -296,94 +296,96 @@ const LocalGame = () => {
 
   return (
     <div className="game">
-      <Box
-        sx={{
-          margin: "0.5rem 1rem",
-          padding: "0.25rem 2rem",
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          gap: "0.5rem",
-        }}
-      >
-        <Typography variant="h4" mr={3}>
-          Local Game
-        </Typography>
+      <div className="game-header">
         <Box
           sx={{
-            margin: "0.5rem",
-            padding: "0.25rem",
+            margin: "0.5rem 0.5rem",
+            padding: "0.25rem 1rem",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
-            gap: "1rem",
+            width: "100%",
+            gap: "0.5rem",
           }}
         >
-          <Tooltip title="Undo Last Move" placement="left">
-            <IconButton
-              onClick={handleUndo}
-              sx={{
-                p: 1,
-                background: "#20927B",
-                "&:hover": {
-                  background: "#59C8B2",
-                },
-              }}
-            >
-              <Undo />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="Restart The Game" placement="right">
-            <IconButton
-              onClick={handleResetGame}
-              sx={{
-                p: 1,
-                background: "#B13333",
-                "&:hover": {
-                  background: "#B47272",
-                },
-              }}
-            >
-              <Restore />
-            </IconButton>
-          </Tooltip>
+          <Typography variant="h4" mr={3}>
+            Local Game
+          </Typography>
+          <Box
+            sx={{
+              margin: "0.5rem",
+              padding: "0.25rem",
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+            }}
+          >
+            <Tooltip title="Undo Last Move" placement="left">
+              <IconButton
+                onClick={handleUndo}
+                sx={{
+                  p: 1,
+                  background: "#20927B",
+                  "&:hover": {
+                    background: "#59C8B2",
+                  },
+                }}
+              >
+                <Undo />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Restart The Game" placement="right">
+              <IconButton
+                onClick={handleResetGame}
+                sx={{
+                  p: 1,
+                  background: "#B13333",
+                  "&:hover": {
+                    background: "#B47272",
+                  },
+                }}
+              >
+                <Restore />
+              </IconButton>
+            </Tooltip>
+          </Box>
         </Box>
-      </Box>
-      <Box
-        sx={{
-          width: "100%",
-          margin: "0.5rem 0",
-          padding: "0.5rem 0",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="h5">
-          {`Turn/Next: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`}
-        </Typography>
         <Box
           sx={{
-            width: 32,
-            height: 32,
-            backgroundColor: turn,
-            border: "1px solid #000",
-            margin: "0.5rem 0.75rem",
-            padding: "0",
-            textAlign: "center",
+            width: "100%",
+            margin: "0.5rem 0",
+            padding: "0.5rem 0",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
           }}
-        ></Box>
-      </Box>
+        >
+          <Typography variant="h5">
+            {`Turn/Next: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`}
+          </Typography>
+          <Box
+            sx={{
+              width: 32,
+              height: 32,
+              backgroundColor: turn,
+              border: "1px solid #000",
+              margin: "0.5rem 0.75rem",
+              padding: "0",
+              textAlign: "center",
+            }}
+          ></Box>
+        </Box>
+      </div>
       <BoardComponent
         squares={squares}
         onClick={handleClick}
         selectedSquare={selectedSquare}
       />
-      <Box sx={{ width: "100%", maxWidth: "20rem", marginTop: 4 }}>
+      <Box sx={{ width: "100%", maxWidth: "30rem", marginTop: 4 }}>
         <FallenSoldierBlock
           whiteFallenSoldiers={whiteFallenSoldiers}
           blackFallenSoldiers={blackFallenSoldiers}
@@ -403,6 +405,11 @@ const LocalGame = () => {
         autoHideDuration={3500}
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        sx={{
+          width: "calc(100% - 2rem)",
+          maxWidth: "45rem",
+          margin: "0 auto",
+        }}
       >
         <Alert
           onClose={handleSnackbarClose}
