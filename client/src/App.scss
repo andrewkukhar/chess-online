@@ -114,10 +114,61 @@
   margin: 0;
   max-width: 100%;
   overflow-x: hidden;
+
+  @media (min-width: 900px) {
+    max-width: 40rem;
+  }
 }
 
-@media (min-width: 900px) {
-  .board-body {
-    max-width: 40rem;
+.auth-page {
+  width: 100%;
+  max-width: 35rem;
+  min-height: 100%;
+  height: calc(100% - 3rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  color: #fff;
+  margin: 0;
+  margin-top: 3rem;
+  padding-bottom: 1rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  .MuiTextField-root {
+    .MuiInputBase-root {
+      background: transparent !important; // Transparent background
+      color: #fff !important; // White text color
+
+      &::before {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.7); // Set bottom border color for input
+      }
+
+      &::after {
+        border-bottom: 1px solid #ffffff; // Set focus bottom border color for input
+      }
+
+      input {
+        color: #fff !important; // Ensure input text is white
+
+        &:-webkit-autofill {
+          -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+          -webkit-text-fill-color: #ffffff !important; // Autofill text color
+          transition: background-color 5000s ease-in-out 0s !important; // Ensures transparent background for autofill
+          background-clip: text !important; // Forces transparent background in Chrome
+        }
+      }
+    }
+
+    .MuiInputLabel-root {
+      color: rgba(255, 255, 255, 0.7) !important; // Label color
+    }
+  }
+
+  // Error message styles
+  .MuiAlert-root {
+    background: rgba(255, 0, 0, 0.1); // Lighter background for error messages
   }
 }

@@ -166,8 +166,7 @@ function isMovePossibleInternal(src, dest, piece, board) {
 }
 
 function isPawnMovePossible(src, dest, player, rowDiff, colDiff, board) {
-  console.log(`Checking pawn move from ${src} to ${dest}, player: ${player}`);
-
+  // console.log(`Checking pawn move from ${src} to ${dest}, player: ${player}`);
   const rowSrc = Math.floor(src / 8);
   const direction = player === 1 ? -1 : 1;
   const startingRow = player === 1 ? 6 : 1;
@@ -188,9 +187,9 @@ function isPawnMovePossible(src, dest, player, rowDiff, colDiff, board) {
   }
 
   if (Math.abs(colDiff) === 1 && rowDiff === direction) {
-    console.log(
-      `Pawn attempting capture from ${src} to ${dest}, player: ${player}`
-    );
+    // console.log(
+    //   `Pawn attempting capture from ${src} to ${dest}, player: ${player}`
+    // );
     if (board[dest] && board[dest].player !== player) {
       console.log(`Capture is possible at ${dest}`);
       return true;
