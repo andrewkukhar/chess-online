@@ -252,6 +252,7 @@ function isKingMovePossible(absRowDiff, absColDiff) {
 function validateMove(board, move, player) {
   const { from, to, piece } = move;
   const movingPiece = board[from];
+  const destinationPiece = board[to];
 
   // Ensure there is a piece at the source
   if (!movingPiece) {
@@ -263,6 +264,10 @@ function validateMove(board, move, player) {
     return false;
   }
 
+  if (destinationPiece && destinationPiece.player === player) {
+    return false;
+  }
+
   // Ensure the move is possible according to piece rules
   if (!isMovePossibleInternal(from, to, movingPiece, board)) {
     return false;
@@ -270,7 +275,6 @@ function validateMove(board, move, player) {
 
   // Make a temporary move on a cloned board to check for check
   const tempBoard = board.map((piece) => (piece ? { ...piece } : null));
-  const capturedPiece = tempBoard[to];
   tempBoard[to] = tempBoard[from];
   tempBoard[from] = null;
 
