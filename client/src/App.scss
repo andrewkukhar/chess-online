@@ -10,9 +10,16 @@
   overflow: hidden;
 
   .app-navbar {
+    position: fixed;
+    top: 0;
+    z-index: 1000;
     width: 100%;
-    overflow: hidden;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(0deg, #32495d 0%, #26453a 100%);
+    height: 4.5rem;
   }
 
   .app-body {
@@ -33,26 +40,39 @@
 }
 
 .navbar {
-  position: fixed;
-  top: 0;
-  z-index: 1000;
   width: 100%;
+  max-width: 40rem;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(0deg, #32495d 0%, #26453a 100%);
-  height: 4.5rem;
+  margin: 0;
+  padding: 0;
 
   .navbar-appbar {
     width: 100%;
-    max-width: 40rem;
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    padding: 1rem 2rem;
+    padding: 0.5rem 2rem;
     margin: 0 auto;
+    font-size: 1rem;
+
+    &-body {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      gap: 0;
+
+      @media (max-width: 600px) {
+        gap: 1rem;
+      }
+    }
   }
 }
 
@@ -171,4 +191,20 @@
   .MuiAlert-root {
     background: rgba(255, 0, 0, 0.1); // Lighter background for error messages
   }
+}
+
+.online-landing-page {
+  width: 100%;
+  max-width: 35rem;
+  height: calc(100% - 10rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: center;
+  padding: 1rem 2rem;
+  color: #fff;
+  margin: 0;
+  margin-top: 15rem;
+  overflow-y: auto;
+  overflow-x: hidden;
 }

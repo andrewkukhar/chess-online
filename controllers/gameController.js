@@ -181,7 +181,7 @@ exports.leaveGame = async (req, res) => {
       return res.status(404).json({ message: "Game not found." });
     }
 
-    if (!game.players.includes(mongoose.Types.ObjectId(playerId))) {
+    if (!game.players.includes(playerId)) {
       return res
         .status(400)
         .json({ message: "You are not part of this game." });

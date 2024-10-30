@@ -9,9 +9,16 @@ import {
   Menu,
   MenuItem,
   CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
+import LogoutIcon from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import HomeIcon from "@mui/icons-material/Home";
+import PublicIcon from "@mui/icons-material/Public";
+import MobileOffIcon from "@mui/icons-material/MobileOff";
+import LoginIcon from "@mui/icons-material/Login";
 
 const Navbar = () => {
   const { token, username, isTokenReady, userId, handleLogout } =
@@ -19,6 +26,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
+  const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   const {
     data: gamesData,
@@ -41,32 +50,67 @@ const Navbar = () => {
     navigate("/login");
   };
 
+  const iconStyle = { fontSize: "2.5rem", width: "2.5rem" };
+  const iconButtonStyle = {
+    fontSize: "3.5rem",
+    width: "3.5rem",
+    height: "2rem",
+  };
+  const buttonStyle = {
+    fontSize: "3.5rem",
+    width: "2.5rem",
+    minWidth: "2.5rem",
+  };
+
   return (
     <div className="navbar">
       <div className="navbar-appbar">
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{
+            flexGrow: 1,
+            fontSize: "1.5rem",
+            textAlign: "start",
+            width: "100%",
+          }}
+        >
           <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
-            Chess Game
+            {isSmallScreen ? <HomeIcon sx={iconStyle} /> : "Chess Game"}
           </Link>
         </Typography>
         {!token ? (
-          <>
+          <div className="navbar-appbar-body">
             <Tooltip title="Login to play online game" placement="bottom">
-              <Button color="inherit" component={Link} to="/login">
-                Login
+              <Button
+                color="inherit"
+                component={Link}
+                to="/login"
+                startIcon={
+                  isSmallScreen ? <LoginIcon sx={iconButtonStyle} /> : null
+                }
+              >
+                {isSmallScreen ? null : "Login"}
               </Button>
             </Tooltip>
             <Tooltip
               title="Play game locally with someone standing with you"
               placement="bottom"
             >
-              <Button color="inherit" component={Link} to="/localgame">
-                Local
+              <Button
+                color="inherit"
+                component={Link}
+                to="/localgame"
+                startIcon={
+                  isSmallScreen ? <MobileOffIcon sx={iconButtonStyle} /> : null
+                }
+              >
+                {isSmallScreen ? null : "Local"}
               </Button>
             </Tooltip>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="navbar-appbar-body">
             <IconButton
               color="inherit"
               onClick={handleMenuOpen}
@@ -74,7 +118,7 @@ const Navbar = () => {
               aria-haspopup="true"
               aria-expanded={open ? "true" : undefined}
             >
-              {username}
+              {isSmallScreen ? <AccountCircleIcon sx={iconStyle} /> : username}
             </IconButton>
             <Menu
               id="user-games-menu"
@@ -109,16 +153,42 @@ const Navbar = () => {
                 <MenuItem disabled>No games found</MenuItem>
               )}
             </Menu>
-            <Button color="inherit" onClick={onLogout}>
-              Logout
-            </Button>
-            <Button color="inherit" component={Link} to="/online">
-              Online
-            </Button>
-            <Button color="inherit" component={Link} to="/localgame">
-              Local
-            </Button>
-          </>
+            <Tooltip title="Logout" placement="bottom">
+              <IconButton
+                color="inherit"
+                onClick={onLogout}
+                sx={{ fontSize: "1rem" }}
+              >
+                {isSmallScreen ? <LogoutIcon sx={iconStyle} /> : "LOGOUT"}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Play online game" placement="bottom">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/online"
+                sx={isSmallScreen ? buttonStyle : null}
+                startIcon={
+                  isSmallScreen ? <PublicIcon sx={iconButtonStyle} /> : null
+                }
+              >
+                {isSmallScreen ? null : "Online"}
+              </Button>
+            </Tooltip>
+            <Tooltip title="Play game locally" placement="bottom">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/localgame"
+                sx={isSmallScreen ? buttonStyle : null}
+                startIcon={
+                  isSmallScreen ? <MobileOffIcon sx={iconButtonStyle} /> : null
+                }
+              >
+                {isSmallScreen ? null : "Local"}
+              </Button>
+            </Tooltip>
+          </div>
         )}
       </div>
     </div>

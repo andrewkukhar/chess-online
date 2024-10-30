@@ -21,7 +21,7 @@ const App = () => {
   return (
     <div className="app">
       <Router>
-        <div className="app-navbar" style={{ width: "100%" }}>
+        <div className="app-navbar">
           <Navbar />
         </div>
         <div className="app-body">

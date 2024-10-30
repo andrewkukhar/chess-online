@@ -1,30 +1,35 @@
 // src/components/Register.js
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useRegisterMutation } from "../../services/api-services/auth";
-import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Typography, Box, Alert } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 
 const Register = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [registerMutation, { isLoading, error }] = useRegisterMutation();
-  const { handleLogin } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await registerMutation({
+      await registerMutation({
         email,
         username,
         password,
-      }).unwrap();
-      const { token, user } = response;
-      const { userId, username: returnedUsername } = user;
-      handleLogin({ token, userId, username: returnedUsername });
-      navigate("/game");
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1000);
     } catch (err) {
       console.error("Registration failed:", err);
     }
@@ -106,7 +111,7 @@ const Register = () => {
           disabled={isLoading}
           sx={{ mt: 3, mb: 2 }}
         >
-          {isLoading ? "Registering..." : "Register"}
+          {isLoading ? <CircularProgress /> : "Register"}
         </Button>
       </Box>
     </div>
