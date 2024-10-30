@@ -65,6 +65,10 @@ export const SocketProvider = ({ children }) => {
         console.log("moveUndone event received", data);
         dispatch(moveApi.util.invalidateTags(["Move"]));
       });
+      newSocket.on("gameReset", (data) => {
+        console.log("gameReset event received", data);
+        dispatch(gameApi.util.invalidateTags(["Game"]));
+      });
 
       return () => newSocket.close();
     }

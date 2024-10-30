@@ -1,9 +1,14 @@
 // src/components/OnlineGame.js
 import React, { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useMakeMoveMutation } from "../../services/api-services/move";
-import { useGetAllMovesQuery } from "../../services/api-services/move";
-import { useGetGameQuery } from "../../services/api-services/game";
+import {
+  useMakeMoveMutation,
+  useGetAllMovesQuery,
+} from "../../services/api-services/move";
+import {
+  useGetGameQuery,
+  useResetGameMutation,
+} from "../../services/api-services/game";
 import {
   Box,
   Typography,
@@ -60,6 +65,7 @@ const OnlineGame = () => {
     skip: !gameId,
   });
   const [makeMove] = useMakeMoveMutation();
+  const [resetGameApi] = useResetGameMutation();
 
   // Local State
   const [squares, setSquares] = useState(() => initialiseChessBoard());
@@ -153,33 +159,58 @@ const OnlineGame = () => {
 
     socket.on("newMove", handleNewMove);
 
+    const handleResetGameEvent = (data) => {
+      if (data.gameId === gameId) {
+        setSnackbarAlert({
+          open: true,
+          message: "the congoing game has been reset.",
+          severity: "info",
+        });
+        resetGame({
+          setSquares,
+          setWhiteFallenSoldiers,
+          setBlackFallenSoldiers,
+          setPlayer: () => {},
+          setTurn: () => {},
+          setStatus: () => {},
+          setSelectedSquare,
+        });
+
+        refetchGameData();
+        refetchMoves();
+      }
+    };
+
+    socket.on("gameReset", handleResetGameEvent);
+
     return () => {
       socket.off("newMove", handleNewMove);
+      socket.off("gameReset", handleResetGameEvent);
     };
-  }, [socket, gameId, refetchMoves, refetchGameData]);
+  }, [socket, gameId, userId, refetchMoves, refetchGameData]);
 
   const handleResetGame = () => {
     setOpenConfirm(true);
   };
 
-  const handleConfirmReset = () => {
-    resetGame({
-      setSquares,
-      setWhiteFallenSoldiers,
-      setBlackFallenSoldiers,
-      setPlayer: () => {}, // Update as per your resetGame implementation
-      setTurn: () => {},
-      setStatus: () => {},
-      setSelectedSquare,
-    });
-    setOpenConfirm(false);
-    setSnackbarAlert({
-      open: true,
-      message: "Game has been reset.",
-      severity: "info",
-    });
-    // Emit a socket event to notify the server about the reset, if necessary
-    socket.emit("resetGame", { gameId });
+  const handleConfirmReset = async () => {
+    const result = await resetGameApi({ gameId });
+    if (result?.data) {
+      setSnackbarAlert({
+        open: true,
+        message: result?.data?.message || "Game has been reset successfully.",
+        severity: "info",
+      });
+
+      setOpenConfirm(false);
+    } else {
+      console.log("Error result:", result);
+      setSnackbarAlert({
+        open: true,
+        message: result?.error?.data?.message || `Failed to reset game.`,
+        severity: "error",
+      });
+    }
   };
 
   const handleCancelReset = () => {

@@ -67,6 +67,14 @@ export const gameApi = createApi({
       skip: (userId) => !userId,
       providesTags: (result, error, gameId) => [{ type: "Game", id: gameId }],
     }),
+    resetGame: builder.mutation({
+      query: ({ gameId }) => ({
+        url: "reset-game",
+        method: "POST",
+        body: { gameId },
+      }),
+      invalidatesTags: ["Game"],
+    }),
   }),
 });
 
@@ -78,5 +86,6 @@ export const {
   useRemoveGameMutation,
   useGetGameQuery,
   useGetAllGamesQuery,
+  useResetGameMutation,
 } = gameApi;
 export default gameApi;

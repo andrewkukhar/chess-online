@@ -166,6 +166,8 @@ function isMovePossibleInternal(src, dest, piece, board) {
 }
 
 function isPawnMovePossible(src, dest, player, rowDiff, colDiff, board) {
+  console.log(`Checking pawn move from ${src} to ${dest}, player: ${player}`);
+
   const rowSrc = Math.floor(src / 8);
   const direction = player === 1 ? -1 : 1;
   const startingRow = player === 1 ? 6 : 1;
@@ -185,10 +187,15 @@ function isPawnMovePossible(src, dest, player, rowDiff, colDiff, board) {
     }
   }
 
-  // Capture move
-  if (colDiff === 1 && rowDiff === direction) {
+  if (Math.abs(colDiff) === 1 && rowDiff === direction) {
+    console.log(
+      `Pawn attempting capture from ${src} to ${dest}, player: ${player}`
+    );
     if (board[dest] && board[dest].player !== player) {
+      console.log(`Capture is possible at ${dest}`);
       return true;
+    } else {
+      console.log(`No opponent piece at ${dest} to capture`);
     }
   }
 
@@ -229,7 +236,7 @@ function isRookMovePossible(src, dest, rowDiff, colDiff, board) {
     current += stepRow * 8 + stepCol;
   }
 
-  return true;
+  return board[dest] === null || board[dest].player !== board[src].player;
 }
 
 function isKingMovePossible(absRowDiff, absColDiff) {
@@ -269,8 +276,10 @@ function validateMove(board, move, player) {
   tempBoard[from] = null;
 
   // Check if the player's King is in check after the move
-  if (isKingInCheck(tempBoard, player)) {
-    return false;
+  if (piece === "King" || isKingInCheck(tempBoard, player)) {
+    if (isKingInCheck(tempBoard, player)) {
+      return false;
+    }
   }
 
   return true;

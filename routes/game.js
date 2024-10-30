@@ -10,6 +10,7 @@ const {
   removeGame,
   getGame,
   getAllGames,
+  resetGame,
 } = require("../controllers/gameController");
 
 // @route   POST /api/game/create
@@ -46,5 +47,10 @@ router.get("/get-game/:gameId", auth, getGame);
 // @desc    Get all games
 // @access  Private
 router.get("/get-all-games", auth, getAllGames);
+
+// @route   POST /api/game/reset-game
+// @desc    Reset a game
+// @access  Private
+router.post("/reset-game", auth, resetGame);
 
 module.exports = router;
