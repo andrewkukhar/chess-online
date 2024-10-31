@@ -100,7 +100,6 @@ const OnlineLanding = () => {
           </Button>
         </Tooltip>
       </Box>
-
       <Typography variant="h5" sx={{ mt: 4 }}>
         Your Games
       </Typography>
@@ -120,9 +119,9 @@ const OnlineLanding = () => {
             gap: "1rem",
           }}
         >
-          {gamesData.map((game) => (
+          {gamesData?.map((game) => (
             <Box
-              key={game._id}
+              key={game?._id}
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
@@ -132,12 +131,24 @@ const OnlineLanding = () => {
                 borderRadius: "4px",
               }}
             >
-              <Typography>{game.name || `Game ${game._id}`}</Typography>
+              <Typography
+                component={Link}
+                to={`/game/${game?._id}`}
+                sx={{
+                  textDecoration: "none",
+                  color: "inherit",
+                  "&:hover": {
+                    textDecoration: "underline",
+                  },
+                }}
+              >
+                {game?.name || `Game ${game?._id}`}
+              </Typography>
               <Box>
                 <Tooltip title="Leave Game" placement="top">
                   <IconButton
                     color="warning"
-                    onClick={() => openConfirmDialog("leave", game._id)}
+                    onClick={() => openConfirmDialog("leave", game?._id)}
                   >
                     <ExitToAppIcon />
                   </IconButton>
@@ -145,7 +156,7 @@ const OnlineLanding = () => {
                 <Tooltip title="Remove Game" placement="top">
                   <IconButton
                     color="error"
-                    onClick={() => openConfirmDialog("remove", game._id)}
+                    onClick={() => openConfirmDialog("remove", game?._id)}
                   >
                     <DeleteIcon />
                   </IconButton>
