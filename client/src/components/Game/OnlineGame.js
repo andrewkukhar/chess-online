@@ -280,8 +280,8 @@ const OnlineGame = () => {
       return;
     }
 
-    if (i === selectedSquare) {
-      setSelectedSquare(null);
+    if (clickedPiece && clickedPiece.player === (isHost ? 1 : 2)) {
+      setSelectedSquare(i);
       return;
     }
 
