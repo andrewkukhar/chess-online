@@ -8,6 +8,7 @@ import {
 import {
   useGetGameQuery,
   useResetGameMutation,
+  useSwitchPlayerRolesMutation,
 } from "../../services/api-services/game";
 import {
   Box,
@@ -47,7 +48,10 @@ const OnlineGame = () => {
     severity: "info",
   });
 
-  const [openConfirm, setOpenConfirm] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    action: null,
+  });
 
   // RTK Query Hooks
   const {
@@ -57,6 +61,7 @@ const OnlineGame = () => {
   } = useGetGameQuery(gameId, {
     skip: !gameId,
   });
+  console.log("gameData", gameData);
   const {
     data: movesData,
     refetch: refetchMoves,
@@ -66,7 +71,7 @@ const OnlineGame = () => {
   });
   const [makeMove] = useMakeMoveMutation();
   const [resetGameApi] = useResetGameMutation();
-
+  const [switchPlayerRoles] = useSwitchPlayerRolesMutation();
   // Local State
   const [squares, setSquares] = useState(() => initialiseChessBoard());
   const [whiteFallenSoldiers, setWhiteFallenSoldiers] = useState([]);
@@ -156,7 +161,6 @@ const OnlineGame = () => {
         refetchGameData();
       }
     };
-
     socket.on("newMove", handleNewMove);
 
     const handleResetGameEvent = (data) => {
@@ -180,18 +184,26 @@ const OnlineGame = () => {
         refetchMoves();
       }
     };
-
     socket.on("gameReset", handleResetGameEvent);
+
+    const handlePlayerRolesSwitched = (data) => {
+      if (data.gameId === gameId) {
+        setSnackbarAlert({
+          open: true,
+          message: "Player roles have been switched.",
+          severity: "info",
+        });
+        refetchGameData();
+      }
+    };
+    socket.on("playerRolesSwitched", handlePlayerRolesSwitched);
 
     return () => {
       socket.off("newMove", handleNewMove);
       socket.off("gameReset", handleResetGameEvent);
+      socket.off("playerRolesSwitched", handlePlayerRolesSwitched);
     };
   }, [socket, gameId, userId, refetchMoves, refetchGameData]);
-
-  const handleResetGame = () => {
-    setOpenConfirm(true);
-  };
 
   const handleConfirmReset = async () => {
     const result = await resetGameApi({ gameId });
@@ -202,7 +214,7 @@ const OnlineGame = () => {
         severity: "info",
       });
 
-      setOpenConfirm(false);
+      setConfirmDialog({ open: false, action: null });
     } else {
       console.log("Error result:", result);
       setSnackbarAlert({
@@ -211,10 +223,6 @@ const OnlineGame = () => {
         severity: "error",
       });
     }
-  };
-
-  const handleCancelReset = () => {
-    setOpenConfirm(false);
   };
 
   const handleMove = async (from, to, piece, captured) => {
@@ -308,9 +316,57 @@ const OnlineGame = () => {
     }
   };
 
+  const handleSwitchRoles = async () => {
+    if (!gameId) {
+      setSnackbarAlert({
+        open: true,
+        message: "Game ID is required.",
+        severity: "error",
+      });
+      return;
+    }
+
+    const result = await switchPlayerRoles({ gameId });
+    if (result) {
+      setConfirmDialog({ open: false, gameId: null });
+      setSnackbarAlert({
+        open: true,
+        message: result?.data?.message || "Player roles switched successfully.",
+        severity: "success",
+      });
+      refetchGameData();
+    } else {
+      setSnackbarAlert({
+        open: true,
+        message:
+          result?.error?.data?.message || "Failed to switch player roles.",
+        severity: "error",
+      });
+    }
+  };
+
+  const handleConfirmDialogAction = async () => {
+    if (confirmDialog.action === "resetGame") {
+      await handleConfirmReset();
+    } else if (confirmDialog.action === "switchRoles") {
+      await handleSwitchRoles();
+    }
+  };
+
+  const shouldShowSwitchOption =
+    gameData &&
+    gameData?.players?.length === 2 &&
+    gameData?.moves?.length === 0;
+
   const handleSnackbarClose = (event, reason) => {
     if (reason === "clickaway") return;
     setSnackbarAlert({ open: false, message: "", severity: "info" });
+  };
+
+  const getPlayerNameByColor = (color) => {
+    if (!gameData || !gameData.players) return "";
+    const playerIndex = color === "white" ? 0 : 1;
+    return gameData.players[playerIndex]?.username || color;
   };
 
   if (gameLoading || movesLoading) {
@@ -361,6 +417,18 @@ const OnlineGame = () => {
           >
             Copy Game Link
           </Button>
+          {shouldShowSwitchOption && (
+            <Button
+              variant="outlined"
+              color="info"
+              onClick={() =>
+                setConfirmDialog({ open: true, action: "switchRoles" })
+              }
+            >
+              Switch Roles
+            </Button>
+          )}
+
           <Box
             sx={{
               margin: "0.5rem",
@@ -374,7 +442,9 @@ const OnlineGame = () => {
           >
             <Tooltip title="Restart The Game" placement="right">
               <IconButton
-                onClick={handleResetGame}
+                onClick={() =>
+                  setConfirmDialog({ open: true, action: "resetGame" })
+                }
                 sx={{
                   p: 1,
                   background: "#B13333",
@@ -388,6 +458,12 @@ const OnlineGame = () => {
             </Tooltip>
           </Box>
         </Box>
+        <Box>
+          <Typography variant="h6" mt={1}>
+            Players: {gameData?.players?.[0]?.username || "Player 1"} vs{" "}
+            {gameData?.players?.[1]?.username || "Player 2"}
+          </Typography>
+        </Box>
         <Box
           sx={{
             width: "100%",
@@ -400,9 +476,7 @@ const OnlineGame = () => {
           }}
         >
           <Typography variant="h5">
-            {`Next: ${
-              playerTurn.charAt(0).toUpperCase() + playerTurn.slice(1)
-            }`}
+            {`Next: ${getPlayerNameByColor(playerTurn)}`}
           </Typography>
           <Box
             sx={{
@@ -429,12 +503,22 @@ const OnlineGame = () => {
         />
       </Box>
       <ConfirmationDialog
-        open={openConfirm}
-        title="Restart Game"
-        content="Are you sure you want to restart the game? All current progress will be lost."
-        onConfirm={handleConfirmReset}
-        onCancel={handleCancelReset}
-        confirmText="Restart"
+        open={confirmDialog.open}
+        title={
+          confirmDialog.action === "resetGame"
+            ? "Restart Game"
+            : "Switch Player Roles"
+        }
+        content={
+          confirmDialog.action === "resetGame"
+            ? "Are you sure you want to restart the game? All current progress will be lost."
+            : "Are you sure you want to switch player roles? This can only be done before the first move."
+        }
+        onConfirm={handleConfirmDialogAction}
+        onCancel={() => setConfirmDialog({ open: false, action: null })}
+        confirmText={
+          confirmDialog.action === "resetGame" ? "Restart" : "Switch Roles"
+        }
         cancelText="Cancel"
       />
       <Snackbar

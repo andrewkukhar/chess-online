@@ -75,6 +75,13 @@ export const gameApi = createApi({
       }),
       invalidatesTags: ["Game"],
     }),
+    switchPlayerRoles: builder.mutation({
+      query: ({ gameId }) => ({
+        url: `switch-players-roles/${gameId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Game"],
+    }),
   }),
 });
 
@@ -87,5 +94,6 @@ export const {
   useGetGameQuery,
   useGetAllGamesQuery,
   useResetGameMutation,
+  useSwitchPlayerRolesMutation,
 } = gameApi;
 export default gameApi;

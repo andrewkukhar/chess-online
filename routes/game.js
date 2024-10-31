@@ -11,6 +11,7 @@ const {
   getGame,
   getAllGames,
   resetGame,
+  switchPlayerRoles,
 } = require("../controllers/gameController");
 
 // @route   POST /api/game/create
@@ -52,5 +53,10 @@ router.get("/get-all-games", auth, getAllGames);
 // @desc    Reset a game
 // @access  Private
 router.post("/reset-game", auth, resetGame);
+
+// @route   POST /api/games/switch-players-roles
+// @desc    Reset a game
+// @access  Private
+router.post("/switch-players-roles/:gameId", auth, switchPlayerRoles);
 
 module.exports = router;
