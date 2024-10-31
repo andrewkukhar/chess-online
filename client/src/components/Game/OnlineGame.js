@@ -498,10 +498,7 @@ const OnlineGame = () => {
           selectedSquare={selectedSquare}
         />
       </div>
-      <div
-        className="fallen-soldiers"
-        sx={{ width: "100%", maxWidth: "30rem", marginTop: 4 }}
-      >
+      <div className="fallen-soldiers">
         <FallenSoldierBlock
           whiteFallenSoldiers={whiteFallenSoldiers}
           blackFallenSoldiers={blackFallenSoldiers}

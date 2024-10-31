@@ -14,8 +14,11 @@ const Square = ({ shade, onClick, style, isSelected }) => {
           xs: "100%",
         },
         height: "100%",
-        backgroundColor:
-          shade === "light-square" ? "rgb(195, 238, 237)" : "rgb(80, 79, 79)",
+        backgroundColor: isSelected
+          ? "rgba(0, 195, 255, 0.6)"
+          : shade === "light-square"
+          ? "rgb(195, 238, 237)"
+          : "rgb(80, 79, 79)",
         backgroundImage: style?.backgroundImage || "none",
         backgroundSize: {
           xs: "60%",

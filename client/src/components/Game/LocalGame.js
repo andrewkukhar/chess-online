@@ -380,17 +380,19 @@ const LocalGame = () => {
           ></Box>
         </Box>
       </div>
-      <BoardComponent
-        squares={squares}
-        onClick={handleClick}
-        selectedSquare={selectedSquare}
-      />
-      <Box sx={{ width: "100%", maxWidth: "30rem", marginTop: 4 }}>
+      <div className="board">
+        <BoardComponent
+          squares={squares}
+          onClick={handleClick}
+          selectedSquare={selectedSquare}
+        />
+      </div>
+      <div className="fallen-soldiers">
         <FallenSoldierBlock
           whiteFallenSoldiers={whiteFallenSoldiers}
           blackFallenSoldiers={blackFallenSoldiers}
         />
-      </Box>
+      </div>
       <ConfirmationDialog
         open={openConfirm}
         title="Restart Game"
