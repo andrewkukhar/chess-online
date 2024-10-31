@@ -39,6 +39,7 @@ const OnlineGame = () => {
   const [gameId, setGameId] = useState("");
   const [isHost, setIsHost] = useState(false);
   const [playerColor, setPlayerColor] = useState(null);
+  const [winnerName, setWinnerName] = useState(null);
 
   const [selectedSquare, setSelectedSquare] = useState(null);
 
@@ -61,7 +62,7 @@ const OnlineGame = () => {
   } = useGetGameQuery(gameId, {
     skip: !gameId,
   });
-  console.log("gameData", gameData);
+  // console.log("gameData", gameData);
   const {
     data: movesData,
     refetch: refetchMoves,
@@ -163,6 +164,29 @@ const OnlineGame = () => {
     };
     socket.on("newMove", handleNewMove);
 
+    const handleGameOverEvent = (data) => {
+      if (data.gameId === gameId) {
+        setSnackbarAlert({
+          open: true,
+          message: data.message,
+          severity: "success",
+        });
+        setWinnerName(data.winnerName);
+      }
+    };
+    socket.on("gameOver", handleGameOverEvent);
+
+    const handleCheckEvent = (data) => {
+      if (data.gameId === gameId) {
+        setSnackbarAlert({
+          open: true,
+          message: `Check! The ${data.kingColor} king is under threat.`,
+          severity: "warning",
+        });
+      }
+    };
+    socket.on("checkToKing", handleCheckEvent);
+
     const handleResetGameEvent = (data) => {
       if (data.gameId === gameId) {
         setSnackbarAlert({
@@ -200,6 +224,8 @@ const OnlineGame = () => {
 
     return () => {
       socket.off("newMove", handleNewMove);
+      socket.off("gameOver", handleGameOverEvent);
+      socket.off("checkToKing", handleCheckEvent);
       socket.off("gameReset", handleResetGameEvent);
       socket.off("playerRolesSwitched", handlePlayerRolesSwitched);
     };
@@ -303,7 +329,8 @@ const OnlineGame = () => {
             type: capturedPiece.type,
           }
         : null;
-      console.log("capturedData", capturedData);
+      // console.log("capturedData", capturedData);
+
       handleMove(selectedSquare, i, sourcePiece, capturedData);
       setSelectedSquare(null);
     } else {
@@ -475,20 +502,28 @@ const OnlineGame = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h5">
-            {`Next: ${getPlayerNameByColor(playerTurn)}`}
-          </Typography>
-          <Box
-            sx={{
-              width: 32,
-              height: 32,
-              backgroundColor: playerTurn,
-              border: "1px solid #000",
-              margin: "0.5rem 0.75rem",
-              padding: "0",
-              textAlign: "center",
-            }}
-          ></Box>
+          {winnerName ? (
+            <Typography variant="h5">
+              {`Checkmate! ${winnerName} has won the game!`}
+            </Typography>
+          ) : (
+            <>
+              <Typography variant="h5">
+                {`Next: ${getPlayerNameByColor(playerTurn)}`}
+              </Typography>
+              <Box
+                sx={{
+                  width: 32,
+                  height: 32,
+                  backgroundColor: playerTurn,
+                  border: "1px solid #000",
+                  margin: "0.5rem 0.75rem",
+                  padding: "0",
+                  textAlign: "center",
+                }}
+              ></Box>
+            </>
+          )}
         </Box>
       </div>
       <div className="board">

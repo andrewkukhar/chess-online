@@ -66,7 +66,6 @@ exports.makeMove = async (req, res) => {
       game.players[0]._id.toString() === userId ? "white" : "black";
     const playerNumber = userColor === "white" ? 1 : 2;
 
-    // Determine current turn
     const currentTurnPlayer = game.moves.length % 2 === 0 ? "white" : "black";
 
     if (userColor !== currentTurnPlayer) {
@@ -108,14 +107,16 @@ exports.makeMove = async (req, res) => {
     await game.populate("moves");
 
     const updatedBoard = reconstructBoard(game.moves);
-    if (isKingInCheck(updatedBoard, playerNumber)) {
-      const opponentNumber = playerNumber === 1 ? 2 : 1;
-      const opponentInCheck = isKingInCheck(updatedBoard, opponentNumber);
-      if (opponentInCheck) {
-        const hasLegalMoves = hasAnyLegalMoves(updatedBoard, opponentNumber);
-        if (!hasLegalMoves) {
-          game.status = "checkmate";
-        }
+    let check = false;
+    let checkmate = false;
+    const opponentNumber = playerNumber === 1 ? 2 : 1;
+
+    if (isKingInCheck(updatedBoard, opponentNumber)) {
+      check = true;
+      const hasLegalMoves = hasAnyLegalMoves(updatedBoard, opponentNumber);
+      if (!hasLegalMoves) {
+        checkmate = true;
+        game.status = "checkmate";
       }
     }
 
@@ -131,13 +132,57 @@ exports.makeMove = async (req, res) => {
           moveId: newMove._id,
           game: game,
           playerTurn: updatedPlayerTurn,
+          check,
+          checkmate,
         });
+
+        if (check) {
+          const winner = game.players.find(
+            (player) => player._id.toString() === userId
+          );
+          const winnerName =
+            winner?.username || (userColor === "white" ? "White" : "Black");
+
+          game.players.forEach((player) => {
+            const socketId = socket.getUserSocketId(player._id.toString());
+            if (socketId) {
+              io.to(socketId).emit("checkToKing, ", {
+                gameId: game._id,
+                kingColor: opponentNumber === 1 ? "white" : "black",
+                message: `Check! The ${
+                  opponentNumber === 1 ? "white" : "black"
+                } king is under threat.`,
+              });
+            }
+          });
+        }
+        if (checkmate) {
+          const winner = game.players.find(
+            (player) => player._id.toString() === userId
+          );
+          const winnerName =
+            winner?.username || (userColor === "white" ? "White" : "Black");
+
+          game.players.forEach((player) => {
+            const socketId = socket.getUserSocketId(player._id.toString());
+            if (socketId) {
+              io.to(socketId).emit("gameOver", {
+                gameId: game._id,
+                winner: userColor,
+                winnerName: winnerName,
+                message: `Checkmate! ${winnerName} has won the game.`,
+              });
+            }
+          });
+        }
       }
     });
 
     res.status(201).json({
       message: "Move made successfully.",
       move: newMove,
+      check,
+      checkmate,
     });
   } catch (err) {
     console.error("Error in makeMove:", err.message);

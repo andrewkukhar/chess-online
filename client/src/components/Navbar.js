@@ -111,15 +111,21 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="navbar-appbar-body">
-            <IconButton
-              color="inherit"
-              onClick={handleMenuOpen}
-              aria-controls={open ? "user-games-menu" : undefined}
-              aria-haspopup="true"
-              aria-expanded={open ? "true" : undefined}
-            >
-              {isSmallScreen ? <AccountCircleIcon sx={iconStyle} /> : username}
-            </IconButton>
+            <Tooltip title={`${username} menu`}>
+              <IconButton
+                color="inherit"
+                onClick={handleMenuOpen}
+                aria-controls={open ? "user-games-menu" : undefined}
+                aria-haspopup="true"
+                aria-expanded={open ? "true" : undefined}
+              >
+                {isSmallScreen ? (
+                  <AccountCircleIcon sx={iconStyle} />
+                ) : (
+                  username
+                )}
+              </IconButton>
+            </Tooltip>
             <Menu
               id="user-games-menu"
               anchorEl={anchorEl}
