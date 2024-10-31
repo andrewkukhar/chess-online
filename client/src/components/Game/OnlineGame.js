@@ -491,17 +491,22 @@ const OnlineGame = () => {
           ></Box>
         </Box>
       </div>
-      <BoardComponent
-        squares={squares}
-        onClick={handleSquareClick}
-        selectedSquare={selectedSquare}
-      />
-      <Box sx={{ width: "100%", maxWidth: "30rem", marginTop: 4 }}>
+      <div className="board">
+        <BoardComponent
+          squares={squares}
+          onClick={handleSquareClick}
+          selectedSquare={selectedSquare}
+        />
+      </div>
+      <div
+        className="fallen-soldiers"
+        sx={{ width: "100%", maxWidth: "30rem", marginTop: 4 }}
+      >
         <FallenSoldierBlock
           whiteFallenSoldiers={whiteFallenSoldiers}
           blackFallenSoldiers={blackFallenSoldiers}
         />
-      </Box>
+      </div>
       <ConfirmationDialog
         open={confirmDialog.open}
         title={
