@@ -7,6 +7,7 @@ import {
   Button,
   Typography,
   Box,
+  Snackbar,
   Alert,
   CircularProgress,
 } from "@mui/material";
@@ -17,22 +18,67 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [registerMutation, { isLoading, error }] = useRegisterMutation();
   const navigate = useNavigate();
+  const [snackbarAlert, setSnackbarAlert] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await registerMutation({
-        email,
-        username,
-        password,
+    if (!email?.trim()) {
+      setSnackbarAlert({
+        open: true,
+        message: "Player email is required.",
+        severity: "error",
+      });
+      return;
+    }
+    if (!email?.trim()) {
+      setSnackbarAlert({
+        open: true,
+        message: "Player username is required.",
+        severity: "error",
+      });
+      return;
+    }
+    if (!email?.trim()) {
+      setSnackbarAlert({
+        open: true,
+        message: "Player password is required.",
+        severity: "error",
+      });
+      return;
+    }
+    const result = await registerMutation({
+      email,
+      username,
+      password,
+    });
+
+    if (result && result?.data) {
+      setSnackbarAlert({
+        open: true,
+        message: result?.data?.message || "Registered successfully.",
+        severity: "success",
       });
 
       setTimeout(() => {
         navigate("/login");
-      }, 1000);
-    } catch (err) {
-      console.error("Registration failed:", err);
+      }, 1500);
+    } else {
+      console.error("Registration failed:", result?.error?.data?.message);
+      setSnackbarAlert({
+        open: true,
+        message: result?.error?.data?.message || `Failed to register!`,
+        severity: "error",
+      });
     }
+  };
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === "clickaway") return;
+    setSnackbarAlert({ open: false, message: "", severity: "info" });
   };
 
   return (
@@ -114,6 +160,20 @@ const Register = () => {
           {isLoading ? <CircularProgress /> : "Register"}
         </Button>
       </Box>
+      <Snackbar
+        open={snackbarAlert.open}
+        autoHideDuration={4000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleSnackbarClose}
+          severity={snackbarAlert.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarAlert.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

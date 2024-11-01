@@ -27,7 +27,7 @@ const Square = ({ shade, onClick, style, isSelected }) => {
         },
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
-        transition: "all 0.8s ease-in-out",
+        transition: "all 0.5s ease-in-out",
         "&:hover": {
           backgroundColor: shade === "light-square" ? "#a8dadc" : "#1d3557",
         },

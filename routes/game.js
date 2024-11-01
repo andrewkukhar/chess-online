@@ -3,16 +3,24 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const {
-  createGame,
-  updateGame,
-  joinGame,
-  leaveGame,
   removeGame,
   getGame,
   getAllGames,
-  resetGame,
+} = require("../controllers/games/gameController");
+const {
   switchPlayerRoles,
-} = require("../controllers/gameController");
+} = require("../controllers/games/switchGameRolesController");
+const {
+  resetGame,
+} = require("../controllers/games/resetCreateNewGameController");
+const {
+  joinGame,
+  leaveGame,
+} = require("../controllers/games/joinLeaveGamesController");
+const {
+  createGame,
+  updateGame,
+} = require("../controllers/games/createUpdateGamesController");
 
 // @route   POST /api/game/create
 // @desc    Create a new game

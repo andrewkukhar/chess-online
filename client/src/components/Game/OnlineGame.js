@@ -15,14 +15,13 @@ import {
   Typography,
   Tooltip,
   IconButton,
-  Snackbar,
-  Alert,
   Button,
   CircularProgress,
 } from "@mui/material";
 import { Restore } from "@mui/icons-material";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useSocket } from "../../contexts/SocketContext";
+import { NotificationContext } from "../../contexts/NotificationContext";
 import BoardComponent from "../GameElements/BoardComponent";
 import FallenSoldierBlock from "../GameElements/FallenSoldierBlock";
 import initialiseChessBoard from "../../helpers/board-initialiser";
@@ -42,19 +41,13 @@ const OnlineGame = () => {
   const [winnerName, setWinnerName] = useState(null);
 
   const [selectedSquare, setSelectedSquare] = useState(null);
-
-  const [snackbarAlert, setSnackbarAlert] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
+  const { addNotification } = useContext(NotificationContext);
 
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     action: null,
   });
 
-  // RTK Query Hooks
   const {
     data: gameData,
     isLoading: gameLoading,
@@ -73,7 +66,7 @@ const OnlineGame = () => {
   const [makeMove] = useMakeMoveMutation();
   const [resetGameApi] = useResetGameMutation();
   const [switchPlayerRoles] = useSwitchPlayerRolesMutation();
-  // Local State
+
   const [squares, setSquares] = useState(() => initialiseChessBoard());
   const [whiteFallenSoldiers, setWhiteFallenSoldiers] = useState([]);
   const [blackFallenSoldiers, setBlackFallenSoldiers] = useState([]);
@@ -152,25 +145,17 @@ const OnlineGame = () => {
 
     const handleNewMove = (data) => {
       if (data.gameId === gameId) {
-        setSnackbarAlert({
-          open: true,
-          message: "A new move has been made.",
-          severity: "info",
-        });
+        addNotification("A new move has been made.", "info");
         setPlayerTurn(data.playerTurn);
-        refetchMoves();
-        refetchGameData();
+        refetchMoves?.();
+        refetchGameData?.();
       }
     };
     socket.on("newMove", handleNewMove);
 
     const handleGameOverEvent = (data) => {
       if (data.gameId === gameId) {
-        setSnackbarAlert({
-          open: true,
-          message: data.message,
-          severity: "success",
-        });
+        addNotification(data.message, "success");
         setWinnerName(data.winnerName);
       }
     };
@@ -178,22 +163,25 @@ const OnlineGame = () => {
 
     const handleCheckEvent = (data) => {
       if (data.gameId === gameId) {
-        setSnackbarAlert({
-          open: true,
-          message: `Check! The ${data.kingColor} king is under threat.`,
-          severity: "warning",
-        });
+        addNotification(
+          data.message || `Check! The ${data.kingColor} king is under threat.`,
+          "warning"
+        );
       }
     };
     socket.on("checkToKing", handleCheckEvent);
 
     const handleResetGameEvent = (data) => {
-      if (data.gameId === gameId) {
-        setSnackbarAlert({
-          open: true,
-          message: "the congoing game has been reset.",
-          severity: "info",
-        });
+      if (data.oldGameId === gameId) {
+        addNotification(
+          data.message ||
+            `The ongoing game has been reset. A new game has begun.`,
+          "info"
+        );
+
+        setGameId(data.newGameId);
+        setWinnerName(null);
+
         resetGame({
           setSquares,
           setWhiteFallenSoldiers,
@@ -204,23 +192,26 @@ const OnlineGame = () => {
           setSelectedSquare,
         });
 
-        refetchGameData();
-        refetchMoves();
+        navigate(`/game/${data.newGameId}`);
       }
     };
     socket.on("gameReset", handleResetGameEvent);
 
     const handlePlayerRolesSwitched = (data) => {
       if (data.gameId === gameId) {
-        setSnackbarAlert({
-          open: true,
-          message: "Player roles have been switched.",
-          severity: "info",
-        });
-        refetchGameData();
+        addNotification(`Player roles have been switched.`, "info");
+        refetchGameData?.();
       }
     };
     socket.on("playerRolesSwitched", handlePlayerRolesSwitched);
+
+    const handlePlayerJoinedGame = (data) => {
+      if (data.gameId === gameId) {
+        addNotification(data.message || `New player joined game.`, "info");
+        refetchGameData?.();
+      }
+    };
+    socket.on("playerJoinedGame", handlePlayerJoinedGame);
 
     return () => {
       socket.off("newMove", handleNewMove);
@@ -228,36 +219,38 @@ const OnlineGame = () => {
       socket.off("checkToKing", handleCheckEvent);
       socket.off("gameReset", handleResetGameEvent);
       socket.off("playerRolesSwitched", handlePlayerRolesSwitched);
+      socket.off("playerJoinedGame", handlePlayerJoinedGame);
     };
-  }, [socket, gameId, userId, refetchMoves, refetchGameData]);
+  }, [
+    socket,
+    gameId,
+    userId,
+    navigate,
+    refetchMoves,
+    refetchGameData,
+    addNotification,
+  ]);
 
   const handleConfirmReset = async () => {
     const result = await resetGameApi({ gameId });
     if (result?.data) {
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || "Game has been reset successfully.",
-        severity: "info",
-      });
-
+      // addNotification(
+      //   result?.data?.message || `Game has been reset successfully.`,
+      //   "info"
+      // );
       setConfirmDialog({ open: false, action: null });
     } else {
       console.log("Error result:", result);
-      setSnackbarAlert({
-        open: true,
-        message: result?.error?.data?.message || `Failed to reset game.`,
-        severity: "error",
-      });
+      addNotification(
+        result?.error?.data?.message || `Failed to reset game!`,
+        "error"
+      );
     }
   };
 
   const handleMove = async (from, to, piece, captured) => {
     if (!playerColor) {
-      setSnackbarAlert({
-        open: true,
-        message: "Player color not determined.",
-        severity: "error",
-      });
+      addNotification(`Player color not determined.`, "error");
       return;
     }
     const result = await makeMove({
@@ -266,41 +259,29 @@ const OnlineGame = () => {
     });
 
     if (result?.data && result?.data?.move) {
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || `Move has been made!`,
-        severity: "success",
-      });
+      // addNotification(
+      //   result?.data?.message || `Move has been made!`,
+      //   "success"
+      // );
     } else {
       console.log("Error result:", result);
-      setSnackbarAlert({
-        open: true,
-        message: result?.error?.data?.message || `Failed to make move.`,
-        severity: "error",
-      });
+      addNotification(
+        result?.error?.data?.message || `Failed to make move!`,
+        "error"
+      );
     }
   };
 
   const handleSquareClick = (i) => {
     if (playerTurn !== playerColor) {
-      setSnackbarAlert({
-        open: true,
-        message: "It's not your turn.",
-        severity: "info",
-      });
+      addNotification(`It's not your turn.`, "info");
       return;
     }
 
     const clickedPiece = squares[i];
 
     if (selectedSquare === null) {
-      if (!clickedPiece || clickedPiece.player !== (isHost ? 1 : 2)) {
-        setSnackbarAlert({
-          open: true,
-          message: "Select your own piece.",
-          severity: "error",
-        });
-      } else {
+      if (clickedPiece && clickedPiece.player === (isHost ? 1 : 2)) {
         setSelectedSquare(i);
       }
       return;
@@ -335,40 +316,29 @@ const OnlineGame = () => {
       setSelectedSquare(null);
     } else {
       setSelectedSquare(null);
-      setSnackbarAlert({
-        open: true,
-        message: "Invalid move. Please try again.",
-        severity: "error",
-      });
+      addNotification(`Invalid move. Please try again.`, "error");
     }
   };
 
   const handleSwitchRoles = async () => {
     if (!gameId) {
-      setSnackbarAlert({
-        open: true,
-        message: "Game ID is required.",
-        severity: "error",
-      });
+      addNotification(`Game ID is required.`, "error");
       return;
     }
 
     const result = await switchPlayerRoles({ gameId });
     if (result) {
       setConfirmDialog({ open: false, gameId: null });
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || "Player roles switched successfully.",
-        severity: "success",
-      });
-      refetchGameData();
+      // addNotification(
+      //   result?.data?.message || "Player roles switched successfully.",
+      //   "success"
+      // );
+      refetchGameData?.();
     } else {
-      setSnackbarAlert({
-        open: true,
-        message:
-          result?.error?.data?.message || "Failed to switch player roles.",
-        severity: "error",
-      });
+      addNotification(
+        result?.error?.data?.message || "Failed to switch player roles.",
+        "error"
+      );
     }
   };
 
@@ -384,11 +354,6 @@ const OnlineGame = () => {
     gameData &&
     gameData?.players?.length === 2 &&
     gameData?.moves?.length === 0;
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbarAlert({ open: false, message: "", severity: "info" });
-  };
 
   const getPlayerNameByColor = (color) => {
     if (!gameData || !gameData.players) return "";
@@ -434,11 +399,7 @@ const OnlineGame = () => {
             color="primary"
             onClick={() => {
               navigator.clipboard.writeText(`${gameId}`);
-              setSnackbarAlert({
-                open: true,
-                message: "Game link copied to clipboard.",
-                severity: "success",
-              });
+              addNotification(`Game link copied to clipboard.`, "success");
             }}
             disabled={!gameId}
           >
@@ -455,7 +416,6 @@ const OnlineGame = () => {
               Switch Roles
             </Button>
           )}
-
           <Box
             sx={{
               margin: "0.5rem",
@@ -500,10 +460,19 @@ const OnlineGame = () => {
             flexDirection: "row",
             justifyContent: "flex-start",
             alignItems: "center",
+            ...(winnerName && {
+              className: "winner-highlight",
+            }),
           }}
         >
           {winnerName ? (
-            <Typography variant="h5">
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: "bold",
+                color: "#ff2600",
+              }}
+            >
               {`Checkmate! ${winnerName} has won the game!`}
             </Typography>
           ) : (
@@ -548,7 +517,7 @@ const OnlineGame = () => {
         }
         content={
           confirmDialog.action === "resetGame"
-            ? "Are you sure you want to restart the game? All current progress will be lost."
+            ? "Are you sure you want to restart the game? The new game will be started"
             : "Are you sure you want to switch player roles? This can only be done before the first move."
         }
         onConfirm={handleConfirmDialogAction}
@@ -558,20 +527,6 @@ const OnlineGame = () => {
         }
         cancelText="Cancel"
       />
-      <Snackbar
-        open={snackbarAlert.open}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarAlert.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarAlert.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

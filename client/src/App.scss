@@ -228,3 +228,23 @@
   padding: 0;
   margin: 2rem 0 0 1rem;
 }
+
+@keyframes highlight {
+  0% {
+    background-color: #ff9696;
+  }
+  50% {
+    background-color: #ff2007;
+  }
+  100% {
+    background-color: #d94224;
+  }
+}
+
+.winner-highlight {
+  animation: highlight 1s ease-in-out infinite;
+  border-radius: 5px;
+  padding: 0.5rem;
+  color: #ffffff;
+  background-color: #ff2600; /* Initial background color */
+}

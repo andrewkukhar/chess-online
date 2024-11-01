@@ -3,11 +3,11 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const {
-  makeMove,
   getMove,
   getAllMoves,
   undoMove,
-} = require("../controllers/moveController");
+} = require("../controllers/moves/moveController");
+const { makeMove } = require("../controllers/moves/makeMoveController");
 
 // @route   POST /api/move/make-move
 // @desc    Make a move in a game

@@ -18,16 +18,21 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const verifyToken = () => {
       if (token) {
-        if (isTokenExpired(token)) {
+        try {
+          if (isTokenExpired(token)) {
+            handleLogout();
+          } else {
+            setIsTokenReady(true);
+          }
+        } catch (error) {
           handleLogout();
-        } else {
-          setIsTokenReady(true);
         }
       } else {
         setIsTokenReady(false);
       }
       setIsCheckingToken(false);
     };
+
     if (token) verifyToken();
 
     if (userId) localStorage.setItem("userId", userId);

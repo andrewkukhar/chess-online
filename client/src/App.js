@@ -6,6 +6,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import CreateGame from "./components/Game/CreateGame";
 import JoinGame from "./components/Game/JoinGame";
 import LocalGame from "./components/Game/LocalGame";
@@ -19,53 +20,55 @@ import "./App.scss";
 
 const App = () => {
   return (
-    <div className="app">
-      <Router>
-        <div className="app-navbar">
-          <Navbar />
-        </div>
-        <div className="app-body">
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/localgame" element={<LocalGame />} />
-            <Route
-              path="/online"
-              element={
-                <ProtectedRoute>
-                  <OnlineLanding />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/create"
-              element={
-                <ProtectedRoute>
-                  <CreateGame />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/join"
-              element={
-                <ProtectedRoute>
-                  <JoinGame />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/game/:gameId"
-              element={
-                <ProtectedRoute>
-                  <OnlineGame />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="*" element={<Navigate to="/localgame" replace />} />
-          </Routes>
-        </div>
-      </Router>
-    </div>
+    <NotificationProvider>
+      <div className="app">
+        <Router>
+          <div className="app-navbar">
+            <Navbar />
+          </div>
+          <div className="app-body">
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/localgame" element={<LocalGame />} />
+              <Route
+                path="/online"
+                element={
+                  <ProtectedRoute>
+                    <OnlineLanding />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateGame />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/join"
+                element={
+                  <ProtectedRoute>
+                    <JoinGame />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/game/:gameId"
+                element={
+                  <ProtectedRoute>
+                    <OnlineGame />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="*" element={<Navigate to="/localgame" replace />} />
+            </Routes>
+          </div>
+        </Router>
+      </div>
+    </NotificationProvider>
   );
 };
 
