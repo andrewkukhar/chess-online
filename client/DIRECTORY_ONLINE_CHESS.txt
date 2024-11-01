@@ -9,8 +9,8 @@
 │   ├── index.html
 │   └── robots.txt
 └── src
-    ├── App.css
     ├── App.js
+    ├── App.scss
     ├── chess-logo.png
     ├── components
     │   ├── Authentifications
@@ -29,13 +29,16 @@
     │   └── OnlineLanding.js
     ├── contexts
     │   ├── AuthContext.js
+    │   ├── NotificationContext.js
     │   └── SocketContext.js
     ├── helpers
     │   ├── ConfirmationDialog.js
     │   ├── board-initialiser.js
     │   ├── deserializeSquares.js
+    │   ├── gameStatuses.js
     │   ├── index.js
-    │   └── resetGame.js
+    │   ├── resetGame.js
+    │   └── utils.js
     ├── index.css
     ├── index.js
     ├── pieces
@@ -59,4 +62,4 @@
         ├── ProtectedRoute.js
         └── tokenUtils.js
 
-15 directories, 45 files
+15 directories, 48 files

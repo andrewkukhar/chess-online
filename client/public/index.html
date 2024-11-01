@@ -3,13 +3,53 @@
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
+    <meta name="robots" content="index, follow" />
     <meta
       name="description"
-      property="og:description"
-      content="Online chess game created by AK"
+      content="Play chess online for free with Chess by AK. Challenge your friends or opponents worldwide in a responsive, real-time chess experience. No sign-up required!"
     />
+    <meta name="author" content="AK" />
+    <meta
+      name="keywords"
+      content="online chess, play chess, chess game, chess multiplayer, play chess online, chess friends, free chess game, chess strategy, play with friends"
+    />
+
+    <!-- Open Graph Meta Tags for Social Media Sharing -->
+    <meta
+      property="og:title"
+      content="Play Chess Online for Free | Chess by AK"
+    />
+    <meta
+      property="og:description"
+      content="Play chess online for free with friends and opponents worldwide. No sign-up needed. Enjoy an engaging, responsive chess game."
+    />
+    <meta
+      property="og:image"
+      content="https://chess-two-players.herokuapp.com/chess-logo.png"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://chess-two-players.herokuapp.com/"
+    />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Play Chess Online for Free | Chess by AK"
+    />
+    <meta
+      name="twitter:description"
+      content="Challenge friends and players worldwide to an exciting game of chess online. Free to play, responsive design, and no registration required!"
+    />
+    <meta
+      name="twitter:image"
+      content="https://chess-two-players.herokuapp.com/chess-logo.png"
+    />
+
     <link
       name="image"
       rel="apple-touch-icon"
@@ -23,9 +63,34 @@
       content="https://chess-two-players.herokuapp.com/"
     />
 
-    <title property="og:title">Online Chess by AK</title>
-  </head>
+    <link rel="canonical" href="https://chess-two-players.herokuapp.com/" />
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Online Chess by AK",
+        "url": "https://chess-two-players.herokuapp.com/",
+        "description": "Play chess online for free with friends and opponents worldwide. No sign-up needed. Enjoy an engaging experience with a responsive, user-friendly chess game.",
+        "applicationCategory": "Game",
+        "operatingSystem": "All",
+        "author": {
+          "@type": "Person",
+          "name": "AK"
+        },
+        "screenshot": "https://chess-two-players.herokuapp.com/chess-logo.png"
+      }
+    </script>
+
+    <title>Play Chess Online for Free | Chess by AK</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Century+Gothic:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
   <body>
     <div id="root"></div>
   </body>
