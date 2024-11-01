@@ -22,6 +22,7 @@ import {
 import { Link } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { gameStatusTypes } from "../helpers/utils";
 
 const OnlineLanding = () => {
   const { token, isTokenReady, userId } = useContext(AuthContext);
@@ -30,12 +31,13 @@ const OnlineLanding = () => {
     action: null,
     gameId: null,
   });
+  const [gameFilter, setGameFilter] = useState("all");
 
   const {
     data: gamesData,
     isLoading,
     isError,
-  } = useGetAllGamesQuery(undefined, {
+  } = useGetAllGamesQuery(gameFilter, {
     skip: !isTokenReady || !userId | !token,
   });
 
@@ -60,6 +62,13 @@ const OnlineLanding = () => {
     setConfirmDialog({ open: false, action: null, gameId: null });
   };
 
+  const filteredGames = Array.isArray(gamesData)
+    ? gamesData.filter((game) => {
+        if (gameFilter === "all") return true;
+        return game?.status === gameFilter?.toLowerCase();
+      })
+    : [];
+
   return (
     <div className="online-landing-page">
       <Typography variant="h4" gutterBottom>
@@ -73,8 +82,11 @@ const OnlineLanding = () => {
           width: "100%",
           display: "flex",
           flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
           gap: "1rem",
           mt: 2,
+          px: 2,
         }}
       >
         <Tooltip title="Create a new game session" placement="top">
@@ -103,13 +115,38 @@ const OnlineLanding = () => {
       <Typography variant="h5" sx={{ mt: 4 }}>
         Your Games
       </Typography>
-      {isLoading ? (
-        <CircularProgress sx={{ mt: 2 }} />
-      ) : isError ? (
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          overflowX: "auto",
+          gap: "0.5rem",
+          mb: 2,
+          mt: 2,
+        }}
+      >
+        {gameStatusTypes?.map((filter) => (
+          <Button
+            key={filter}
+            variant={gameFilter === filter ? "contained" : "outlined"}
+            color="primary"
+            onClick={() => setGameFilter(filter)}
+            sx={{
+              flexShrink: 0,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {filter}
+          </Button>
+        ))}
+      </Box>
+      {isLoading && <CircularProgress sx={{ mt: 2 }} />}
+      {isError && (
         <Typography variant="body1" color="error" sx={{ mt: 2 }}>
-          Error loading games.
+          Error loading games. Please try again later.
         </Typography>
-      ) : gamesData && gamesData.length > 0 ? (
+      )}
+      {filteredGames && filteredGames?.length > 0 ? (
         <Box
           sx={{
             mt: 2,
@@ -119,7 +156,7 @@ const OnlineLanding = () => {
             gap: "1rem",
           }}
         >
-          {gamesData?.map((game) => (
+          {filteredGames?.map((game) => (
             <Box
               key={game?._id}
               sx={{

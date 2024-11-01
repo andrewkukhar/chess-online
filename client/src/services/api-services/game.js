@@ -60,8 +60,10 @@ export const gameApi = createApi({
       providesTags: (result, error, gameId) => [{ type: "Game", id: gameId }],
     }),
     getAllGames: builder.query({
-      query: () => ({
-        url: `get-all-games`,
+      query: (status) => ({
+        url: `get-all-games${
+          status && status !== "All" ? `?status=${status}` : ""
+        }`,
         method: "GET",
       }),
       skip: (userId) => !userId,

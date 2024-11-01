@@ -2,11 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
-const {
-  removeGame,
-  getGame,
-  getAllGames,
-} = require("../controllers/games/gameController");
+const { removeGame, getGame } = require("../controllers/games/gameController");
+const { getAllGames } = require("../controllers/games/getAllGamesController");
 const {
   switchPlayerRoles,
 } = require("../controllers/games/switchGameRolesController");

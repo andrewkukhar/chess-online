@@ -1,13 +1,7 @@
 // src/components/Game.js
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Tooltip,
-  IconButton,
-  Snackbar,
-  Alert,
-} from "@mui/material";
+import React, { useState, useEffect, useContext } from "react";
+import { Box, Typography, Tooltip, IconButton } from "@mui/material";
+import { NotificationContext } from "../../contexts/NotificationContext";
 import { Restore, Undo } from "@mui/icons-material";
 import BoardComponent from "../GameElements/BoardComponent";
 import FallenSoldierBlock from "../GameElements/FallenSoldierBlock";
@@ -20,6 +14,7 @@ import ConfirmationDialog from "../../helpers/ConfirmationDialog";
 const VALID_PIECE_TYPES = ["King", "Queen", "Bishop", "Knight", "Rook", "Pawn"];
 
 const LocalGame = () => {
+  const { addNotification } = useContext(NotificationContext);
   const [openConfirm, setOpenConfirm] = useState(false);
   const [history, setHistory] = useState([]);
   const [squares, setSquares] = useState(() => {
@@ -92,16 +87,6 @@ const LocalGame = () => {
   });
   const [selectedSquare, setSelectedSquare] = useState(null);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState("");
-  const [snackbarSeverity, setSnackbarSeverity] = useState("info");
-
-  const showSnackbar = (message, severity = "info") => {
-    setSnackbarMessage(message);
-    setSnackbarSeverity(severity);
-    setSnackbarOpen(true);
-  };
-
   const handleClick = (i) => {
     setHistory((prevHistory) => [
       ...prevHistory,
@@ -121,13 +106,13 @@ const LocalGame = () => {
 
     if (selectedSquare === null) {
       if (!clickedPiece || clickedPiece.player !== player) {
-        showSnackbar(
+        addNotification(
           `Wrong selection. Choose player ${player} pieces.`,
           "error"
         );
       } else {
         setSelectedSquare(i);
-        showSnackbar("Piece selected. Choose destination.", "info");
+        addNotification("Piece selected. Choose destination.", "info");
       }
       return;
     }
@@ -139,7 +124,7 @@ const LocalGame = () => {
 
     if (clickedPiece && clickedPiece.player === player) {
       setSelectedSquare(i);
-      showSnackbar("Piece selected. Choose destination.", "info");
+      addNotification("Piece selected. Choose destination.", "info");
       return;
     }
 
@@ -168,7 +153,7 @@ const LocalGame = () => {
 
       const isCheckMe = isCheckForPlayer(newSquares, player);
       if (isCheckMe) {
-        showSnackbar(
+        addNotification(
           "Check! Choose a valid move to protect your King.",
           "warning"
         );
@@ -184,14 +169,14 @@ const LocalGame = () => {
         setTurn(nextTurn);
         setStatus("");
         setSelectedSquare(null);
-        showSnackbar(
+        addNotification(
           `${nextTurn.charAt(0).toUpperCase() + nextTurn.slice(1)}'s turn`,
           "success"
         );
       }
     } else {
       setSelectedSquare(null);
-      showSnackbar("Invalid move. Please try again.", "error");
+      addNotification("Invalid move. Please try again.", "error");
     }
   };
 
@@ -245,7 +230,7 @@ const LocalGame = () => {
     });
     setHistory([]);
     setOpenConfirm(false);
-    showSnackbar("Game has been reset.", "info");
+    addNotification("Game has been reset.", "info");
   };
 
   const handleCancelReset = () => {
@@ -254,7 +239,7 @@ const LocalGame = () => {
 
   const handleUndo = () => {
     if (history.length === 0) {
-      showSnackbar("No moves to undo.", "info");
+      addNotification("No moves to undo.", "info");
       return;
     }
 
@@ -268,14 +253,7 @@ const LocalGame = () => {
     setStatus(lastState.status);
     setSelectedSquare(lastState.selectedSquare);
     setHistory(history.slice(0, history.length - 1));
-    showSnackbar("Last move undone.", "info");
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") {
-      return;
-    }
-    setSnackbarOpen(false);
+    addNotification("Last move undone.", "info");
   };
 
   useEffect(() => {
@@ -402,25 +380,6 @@ const LocalGame = () => {
         confirmText="Restart"
         cancelText="Cancel"
       />
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3500}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        sx={{
-          width: "calc(100% - 2rem)",
-          maxWidth: "45rem",
-          margin: "0 auto",
-        }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

@@ -1,6 +1,5 @@
 // controllers/gameController.js
 const mongoose = require("mongoose");
-const Move = require("../../models/Move");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
 const io = socket.getIO();
