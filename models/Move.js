@@ -56,4 +56,6 @@ const MoveSchema = new mongoose.Schema({
   },
 });
 
+MoveSchema.index({ game: 1, player: 1 });
+
 module.exports = mongoose.model("Move", MoveSchema);

@@ -45,16 +45,17 @@ exports.joinGame = async (req, res) => {
 
     await game.save();
 
-    game.players.forEach((player) => {
-      const socketId = socket.getUserSocketId(player.toString());
-      if (socketId) {
-        io.to(socketId).emit("playerJoinedGame", {
-          gameId: game._id,
-          playerId,
-          message: "New player joined game.",
-          game,
-        });
-      }
+    const playerSockets = game.players
+      .map((player) => socket.getUserSocketId(player.toString()))
+      .filter((socketId) => socketId);
+
+    playerSockets.forEach((socketId) => {
+      io.to(socketId).emit("playerJoinedGame", {
+        gameId: game._id,
+        playerId,
+        message: "New player joined game.",
+        game,
+      });
     });
 
     res.status(200).json({

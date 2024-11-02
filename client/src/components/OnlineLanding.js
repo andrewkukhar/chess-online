@@ -1,6 +1,7 @@
 // src/components/Game/OnlineLanding.js
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
+import { NotificationContext } from "../contexts/NotificationContext";
 import {
   useGetAllGamesQuery,
   useLeaveGameMutation,
@@ -26,6 +27,7 @@ import { gameStatusTypes } from "../helpers/utils";
 
 const OnlineLanding = () => {
   const { token, isTokenReady, userId } = useContext(AuthContext);
+  const { addNotification } = useContext(NotificationContext);
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
     action: null,
@@ -45,13 +47,45 @@ const OnlineLanding = () => {
   const [removeGame] = useRemoveGameMutation();
 
   const handleLeaveGame = async (gameId) => {
-    await leaveGame({ gameId, playerId: userId });
-    setConfirmDialog({ open: false, action: null, gameId: null });
+    if (!gameId) {
+      addNotification(`Game ID is missing.`, "error");
+      return;
+    }
+    const result = await leaveGame({ gameId, playerId: userId });
+    if (result && result?.data) {
+      addNotification(
+        result?.data?.message || `Game has been left!`,
+        "success"
+      );
+      setConfirmDialog({ open: false, action: null, gameId: null });
+    } else {
+      console.log("Error result:", result);
+      addNotification(
+        result?.error?.data?.message || `Failed to leave the game!`,
+        "error"
+      );
+    }
   };
 
   const handleRemoveGame = async (gameId) => {
-    await removeGame(gameId);
-    setConfirmDialog({ open: false, action: null, gameId: null });
+    if (!gameId) {
+      addNotification(`Game ID is missing.`, "error");
+      return;
+    }
+    const result = await removeGame(gameId);
+    if (result && result?.data) {
+      addNotification(
+        result?.data?.message || `Game has been removed!`,
+        "success"
+      );
+      setConfirmDialog({ open: false, action: null, gameId: null });
+    } else {
+      console.log("Error result:", result);
+      addNotification(
+        result?.error?.data?.message || `Failed to remove the game!`,
+        "error"
+      );
+    }
   };
 
   const openConfirmDialog = (action, gameId) => {

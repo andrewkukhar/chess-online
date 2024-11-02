@@ -1,5 +1,6 @@
 // src/components/Register.js
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { NotificationContext } from "../../contexts/NotificationContext";
 import { useRegisterMutation } from "../../services/api-services/auth";
 import { useNavigate } from "react-router-dom";
 import {
@@ -7,49 +8,33 @@ import {
   Button,
   Typography,
   Box,
-  Snackbar,
   Alert,
   CircularProgress,
 } from "@mui/material";
 
 const Register = () => {
+  const { addNotification } = useContext(NotificationContext);
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [registerMutation, { isLoading, error }] = useRegisterMutation();
   const navigate = useNavigate();
-  const [snackbarAlert, setSnackbarAlert] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email?.trim()) {
-      setSnackbarAlert({
-        open: true,
-        message: "Player email is required.",
-        severity: "error",
-      });
+      addNotification("Player email is required.", "error");
       return;
     }
-    if (!email?.trim()) {
-      setSnackbarAlert({
-        open: true,
-        message: "Player username is required.",
-        severity: "error",
-      });
+    if (!username?.trim()) {
+      addNotification("Player username is required.", "error");
       return;
     }
-    if (!email?.trim()) {
-      setSnackbarAlert({
-        open: true,
-        message: "Player password is required.",
-        severity: "error",
-      });
+    if (!password?.trim()) {
+      addNotification("Player password is required.", "error");
       return;
     }
+
     const result = await registerMutation({
       email,
       username,
@@ -57,28 +42,20 @@ const Register = () => {
     });
 
     if (result && result?.data) {
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || "Registered successfully.",
-        severity: "success",
-      });
-
+      addNotification(
+        result?.data?.message || "Registered successfully.",
+        "success"
+      );
       setTimeout(() => {
         navigate("/login");
       }, 1500);
     } else {
       console.error("Registration failed:", result?.error?.data?.message);
-      setSnackbarAlert({
-        open: true,
-        message: result?.error?.data?.message || `Failed to register!`,
-        severity: "error",
-      });
+      addNotification(
+        result?.error?.data?.message || `Failed to register!`,
+        "error"
+      );
     }
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbarAlert({ open: false, message: "", severity: "info" });
   };
 
   return (
@@ -162,20 +139,6 @@ const Register = () => {
           </Button>
         </Box>
       </div>
-      <Snackbar
-        open={snackbarAlert.open}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarAlert.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarAlert.message}
-        </Alert>
-      </Snackbar>
     </div>
   );
 };

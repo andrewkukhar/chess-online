@@ -1,5 +1,5 @@
-.
-├── tree -I 'node_modules|build' > DIRECTORY_ONLINE_CHESS.txt
+.tree -I 'node_modules|build' > DIRECTORY_ONLINE_CHESS.txt
+├── DIRECTORY_ONLINE_CHESS.txt
 ├── app.js
 ├── client
 │   ├── DIRECTORY_ONLINE_CHESS.txt
@@ -29,7 +29,12 @@
 │       │   │   ├── FallenSoldierBlock.js
 │       │   │   └── SquareElement.js
 │       │   ├── Navbar.js
-│       │   └── OnlineLanding.js
+│       │   ├── OnlineLanding.js
+│       │   └── assets
+│       │       └── scss
+│       │           ├── main.scss
+│       │           ├── notification-snackbar.scss
+│       │           └── variables.scss
 │       ├── contexts
 │       │   ├── AuthContext.js
 │       │   ├── NotificationContext.js
@@ -93,4 +98,4 @@
 │   └── move.js
 └── socket.js
 
-23 directories, 71 files
+25 directories, 74 files

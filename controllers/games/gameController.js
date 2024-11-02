@@ -32,13 +32,14 @@ exports.removeGame = async (req, res) => {
 
     await Game.deleteOne({ _id: game._id });
 
-    game.players.forEach((player) => {
-      const socketId = socket.getUserSocketId(player.toString());
-      if (socketId) {
-        io.to(socketId).emit("gameRemoved", {
-          gameId,
-        });
-      }
+    const playerSockets = game.players
+      .map((player) => socket.getUserSocketId(player.toString()))
+      .filter((socketId) => socketId);
+
+    playerSockets.forEach((socketId) => {
+      io.to(socketId).emit("gameRemoved", {
+        gameId,
+      });
     });
 
     res.status(200).json({ message: "Game removed successfully." });

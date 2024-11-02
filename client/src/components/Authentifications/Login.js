@@ -14,11 +14,11 @@ import {
 } from "@mui/material";
 
 const Login = () => {
+  const { handleLogin } = useContext(AuthContext);
+  const [loginMutation, { isLoading, error }] = useLoginMutation();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loginMutation, { isLoading, error }] = useLoginMutation();
-  const { handleLogin } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -37,9 +37,7 @@ exports.makeMove = async (req, res) => {
   }
 
   try {
-    const game = await Game.findById(gameId)
-      .populate("players")
-      .populate("moves");
+    const game = await Game.findById(gameId).populate("moves players");
     if (!game) {
       return res.status(404).json({ message: "Game not found." });
     }
@@ -90,15 +88,9 @@ exports.makeMove = async (req, res) => {
       piece: move.piece.trim(),
       captured: capturedData,
     });
-
     await newMove.save();
 
-    game.moves.push(newMove._id);
-    await game.save();
-
-    await game.populate("moves");
-
-    const updatedBoard = reconstructBoard(game.moves);
+    const updatedBoard = reconstructBoard([...game.moves, newMove]);
     let check = false;
     let checkmate = false;
     const opponentNumber = playerNumber === 1 ? 2 : 1;
@@ -112,61 +104,50 @@ exports.makeMove = async (req, res) => {
       }
     }
 
+    game.moves.push(newMove._id);
     await game.save();
 
     const updatedPlayerTurn = game.moves.length % 2 === 0 ? "white" : "black";
 
-    game.players.forEach((player) => {
-      const socketId = socket.getUserSocketId(player._id.toString());
-      if (socketId) {
-        io.to(socketId).emit("newMove", {
+    const playerSockets = game.players
+      .map((player) => socket.getUserSocketId(player._id.toString()))
+      .filter((socketId) => socketId);
+
+    playerSockets.forEach((socketId) => {
+      io.to(socketId).emit("newMove", {
+        gameId: game._id,
+        moveId: newMove._id,
+        game: game,
+        playerTurn: updatedPlayerTurn,
+        check,
+        checkmate,
+      });
+
+      if (check) {
+        // console.log("DEBUG: check exec", check);
+        io.to(socketId).emit("checkToKing", {
           gameId: game._id,
-          moveId: newMove._id,
-          game: game,
-          playerTurn: updatedPlayerTurn,
-          check,
-          checkmate,
+          kingColor: opponentNumber === 1 ? "white" : "black",
+          message: `Check! The ${
+            opponentNumber === 1 ? "white" : "black"
+          } king is under threat.`,
         });
+      }
 
-        if (check) {
-          console.log("DEBUG: check exec", check);
+      if (checkmate) {
+        // console.log("DEBUG: checkmate exec", checkmate);
+        const winner = game.players.find(
+          (player) => player._id.toString() === userId
+        );
+        const winnerName =
+          winner?.username || (userColor === "white" ? "White" : "Black");
 
-          const socketId = socket.getUserSocketId(player._id.toString());
-          if (socketId) {
-            console.log("DEBUG: check exec: opponentNumber", opponentNumber);
-            io.to(socketId).emit("checkToKing", {
-              gameId: game._id,
-              kingColor: opponentNumber === 1 ? "white" : "black",
-              message: `Check! The ${
-                opponentNumber === 1 ? "white" : "black"
-              } king is under threat.`,
-            });
-          }
-        }
-
-        if (checkmate) {
-          console.log("DEBUG: checkmate exec", checkmate);
-          const winner = game.players.find(
-            (player) => player._id.toString() === userId
-          );
-          const winnerName =
-            winner?.username || (userColor === "white" ? "White" : "Black");
-
-          const socketId = socket.getUserSocketId(player._id.toString());
-          if (socketId) {
-            console.log(
-              "DEBUG: checkmate exec: opponentNumber",
-              opponentNumber
-            );
-
-            io.to(socketId).emit("gameOver", {
-              gameId: game._id,
-              winner: userColor,
-              winnerName: winnerName,
-              message: `Checkmate! ${winnerName} has won the game.`,
-            });
-          }
-        }
+        io.to(socketId).emit("gameOver", {
+          gameId: game._id,
+          winner: userColor,
+          winnerName: winnerName,
+          message: `Checkmate! ${winnerName} has won the game.`,
+        });
       }
     });
 

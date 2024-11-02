@@ -40,17 +40,18 @@ exports.resetGame = async (req, res) => {
 
     await newGame.save();
 
-    game.players.forEach((player) => {
-      const socketId = socket.getUserSocketId(player.toString());
-      if (socketId) {
-        io.to(socketId).emit("gameReset", {
-          oldGameId: game._id,
-          newGameId: newGame._id,
-          newGame,
-          message: "Ongoing Game has been finished. A new game has begun.",
-          userId,
-        });
-      }
+    const playerSockets = game.players
+      .map((player) => socket.getUserSocketId(player.toString()))
+      .filter((socketId) => socketId);
+
+    playerSockets.forEach((socketId) => {
+      io.to(socketId).emit("gameReset", {
+        oldGameId: game._id,
+        newGameId: newGame._id,
+        newGame,
+        message: "Ongoing Game has been finished. A new game has begun.",
+        userId,
+      });
     });
 
     res.status(200).json({
