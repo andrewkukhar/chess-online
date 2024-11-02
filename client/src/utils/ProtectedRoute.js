@@ -10,7 +10,6 @@ const ProtectedRoute = ({ children }) => {
   // console.log("token", token);
   // console.log("isTokenReady", isTokenReady);
   if (isCheckingToken) {
-    // Display a loading spinner while checking authentication
     return (
       <Box
         sx={{

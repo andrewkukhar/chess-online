@@ -1,63 +1,46 @@
 // src/components/CreateGame.js
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { NotificationContext } from "../../contexts/NotificationContext";
 import { useCreateGameMutation } from "../../services/api-services/game";
 import {
   Button,
   Box,
   Typography,
-  Snackbar,
-  Alert,
   CircularProgress,
   TextField,
 } from "@mui/material";
 
 const CreateGame = () => {
   const navigate = useNavigate();
-
+  const { addNotification } = useContext(NotificationContext);
   const [gameName, setGameName] = useState("");
-  const [snackbarAlert, setSnackbarAlert] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
-
   const [createGame, { isLoading }] = useCreateGameMutation();
 
   const handleCreateNewGame = async () => {
     if (!gameName.trim()) {
-      setSnackbarAlert({
-        open: true,
-        message: `Please enter a valid game name!`,
-        severity: "warning",
-      });
+      addNotification(`Please enter a valid game name!`, "warning");
       return;
     }
     const result = await createGame(gameName);
 
     if (result?.data && result?.data?.game) {
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || `Game created successfully!`,
-        severity: "success",
-      });
+      addNotification(
+        result?.data?.message || `Game created successfully!`,
+        "success"
+      );
+
       localStorage.setItem("currentGameId", result?.data?.game?._id);
       setTimeout(() => {
         navigate(`/game/${result?.data?.game?._id}`);
       }, 2000);
     } else {
       console.log("Error result:", result);
-      setSnackbarAlert({
-        open: true,
-        message: result?.error?.data?.message || `Failed to create game!`,
-        severity: "error",
-      });
+      addNotification(
+        result?.error?.data?.message || `Failed to create game!`,
+        "error"
+      );
     }
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbarAlert({ open: false, message: "", severity: "info" });
   };
 
   return (
@@ -101,20 +84,6 @@ const CreateGame = () => {
           "Create Game"
         )}
       </Button>
-      <Snackbar
-        open={snackbarAlert.open}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarAlert.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarAlert.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

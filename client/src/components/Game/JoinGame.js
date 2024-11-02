@@ -7,59 +7,42 @@ import {
   Box,
   Typography,
   TextField,
-  Snackbar,
-  Alert,
   CircularProgress,
 } from "@mui/material";
 import { AuthContext } from "../../contexts/AuthContext";
+import { NotificationContext } from "../../contexts/NotificationContext";
 
 const JoinGame = () => {
+  const { addNotification } = useContext(NotificationContext);
   const [gameId, setGameId] = useState("");
   const navigate = useNavigate();
   const { userId } = useContext(AuthContext);
-
-  const [snackbarAlert, setSnackbarAlert] = useState({
-    open: false,
-    message: "",
-    severity: "info",
-  });
 
   const [joinGame, { isLoading }] = useJoinGameMutation();
 
   const handleJoinGame = async () => {
     if (!gameId.trim()) {
-      setSnackbarAlert({
-        open: true,
-        message: `Please enter a valid game id!`,
-        severity: "warning",
-      });
+      addNotification(`Game ID is missing.`, "warning");
       return;
     }
     const result = await joinGame({ gameId, playerId: userId });
 
     if (result?.data && result?.data?.game) {
-      setSnackbarAlert({
-        open: true,
-        message: result?.data?.message || `Joined game successfully!`,
-        severity: "success",
-      });
+      addNotification(
+        result?.data?.message || `Joined game successfully!`,
+        "success"
+      );
       localStorage.setItem("currentGameId", result?.data?.game?._id);
       setTimeout(() => {
         navigate(`/game/${result?.data?.game?._id}`);
       }, 2000);
     } else {
       console.log("Error result:", result);
-      setSnackbarAlert({
-        open: true,
-        message: result?.error?.data?.message || `Failed to join game!`,
-        severity: "error",
-      });
+      addNotification(
+        result?.error?.data?.message || `Failed to join game!`,
+        "error"
+      );
     }
-  };
-
-  const handleSnackbarClose = (event, reason) => {
-    if (reason === "clickaway") return;
-    setSnackbarAlert({ open: false, message: "", severity: "info" });
   };
 
   return (
@@ -103,20 +86,6 @@ const JoinGame = () => {
           "Join Game"
         )}
       </Button>
-      <Snackbar
-        open={snackbarAlert.open}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbarAlert.severity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarAlert.message}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 };

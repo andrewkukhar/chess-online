@@ -166,10 +166,6 @@ const OnlineLanding = () => {
               variant={gameFilter === filter ? "contained" : "outlined"}
               color="primary"
               onClick={() => setGameFilter(filter)}
-              // sx={{
-              //   flexShrink: 0,
-              //   whiteSpace: "nowrap",
-              // }}
             >
               {filter}
             </Button>
