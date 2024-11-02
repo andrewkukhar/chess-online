@@ -85,7 +85,14 @@ const LocalGame = () => {
     }
     return "";
   });
-  const [lastMove, setLastMove] = useState({ from: null, to: null });
+  const [lastMove, setLastMove] = useState(() => {
+    const savedState = localStorage.getItem("chessGameState");
+    if (savedState) {
+      const parsedState = JSON.parse(savedState);
+      return parsedState.lastMove || { from: null, to: null };
+    }
+    return { from: null, to: null };
+  });
 
   const [selectedSquare, setSelectedSquare] = useState(null);
 
@@ -124,6 +131,7 @@ const LocalGame = () => {
         turn,
         status,
         selectedSquare,
+        lastMove,
       },
     ]);
 
@@ -138,7 +146,6 @@ const LocalGame = () => {
         );
       } else {
         setSelectedSquare(i);
-        // addNotification("Piece selected. Choose destination.", "info");
       }
       return;
     }
@@ -151,7 +158,6 @@ const LocalGame = () => {
 
     if (clickedPiece && clickedPiece.player === player) {
       setSelectedSquare(i);
-      // addNotification("Piece selected. Choose destination.", "info");
       return;
     }
 
@@ -312,12 +318,21 @@ const LocalGame = () => {
         player,
         turn,
         status,
+        lastMove,
       };
       localStorage.setItem("chessGameState", JSON.stringify(serializedState));
     } catch (error) {
       console.error("Failed to save chess game state:", error);
     }
-  }, [squares, whiteFallenSoldiers, blackFallenSoldiers, player, turn, status]);
+  }, [
+    squares,
+    whiteFallenSoldiers,
+    blackFallenSoldiers,
+    player,
+    turn,
+    status,
+    lastMove,
+  ]);
 
   return (
     <div className="game">
