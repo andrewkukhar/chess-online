@@ -477,7 +477,7 @@ const OnlineGame = () => {
             </Typography>
           ) : (
             <>
-              <Typography variant="h5">
+              <Typography variant="h6">
                 {`Next: ${getPlayerNameByColor(playerTurn)}`}
               </Typography>
               <Box

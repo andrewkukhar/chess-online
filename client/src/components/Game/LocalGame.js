@@ -287,7 +287,7 @@ const LocalGame = () => {
             gap: "0.5rem",
           }}
         >
-          <Typography variant="h4" mr={3}>
+          <Typography variant="h7" mr={2}>
             Local Game
           </Typography>
           <Box
@@ -342,8 +342,8 @@ const LocalGame = () => {
             alignItems: "center",
           }}
         >
-          <Typography variant="h5">
-            {`Turn/Next: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`}
+          <Typography variant="h7">
+            {`Next: ${turn.charAt(0).toUpperCase() + turn.slice(1)}`}
           </Typography>
           <Box
             sx={{
