@@ -1,0 +1,96 @@
+// notification-snackbar.scss
+
+.notification-snackbar {
+  position: fixed;
+  max-width: 25rem;
+  width: 100%;
+  z-index: 1100;
+  left: 50%;
+  min-height: fit-content;
+  max-height: fit-content;
+  padding: 0;
+  margin: 0;
+
+  @media (max-width: 600px) {
+    width: 90%;
+    &.notification-snackbar-0 {
+      top: 2rem;
+    }
+    &.notification-snackbar-1 {
+      top: 4rem;
+    }
+    &.notification-snackbar-2 {
+      top: 6rem;
+    }
+    &.notification-snackbar-3 {
+      top: 8rem;
+    }
+    &.notification-snackbar-4 {
+      top: 10rem;
+    }
+    &.notification-snackbar-5 {
+      top: 12rem;
+    }
+  }
+
+  @media (min-width: 600px) {
+    max-width: 90%;
+    &.notification-snackbar-0 {
+      top: 2rem;
+    }
+    &.notification-snackbar-1 {
+      top: 5rem;
+    }
+    &.notification-snackbar-2 {
+      top: 8rem;
+    }
+    &.notification-snackbar-3 {
+      top: 11rem;
+    }
+    &.notification-snackbar-4 {
+      top: 14rem;
+    }
+    &.notification-snackbar-5 {
+      top: 17rem;
+    }
+  }
+
+  .notification-alert {
+    width: 50%;
+    min-height: fit-content;
+    max-height: fit-content;
+    margin: 0;
+
+    &.MuiAlert-filledInfo {
+      background-color: rgba(75, 121, 161, 0.25);
+    }
+    &.MuiAlert-filledSuccess {
+      background-color: rgba(76, 175, 80, 0.25);
+    }
+    &.MuiAlert-filledWarning {
+      background-color: rgba(255, 162, 0, 0.25);
+    }
+    &.MuiAlert-filledError {
+      background-color: rgba(244, 67, 54, 0.25);
+    }
+
+    box-shadow: none;
+    backdrop-filter: blur(5px);
+
+    @media (max-width: 600px) {
+      text-align: center;
+      text-wrap: wrap;
+      font-size: 0.65rem;
+      padding: 0 0.5rem;
+      margin: 0;
+    }
+
+    @media (min-width: 600px) {
+      text-align: center;
+      text-wrap: wrap;
+      font-size: 0.85rem;
+      padding: 0 0.95rem;
+      margin: 0;
+    }
+  }
+}
