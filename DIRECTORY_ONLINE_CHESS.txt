@@ -1,5 +1,5 @@
-.tree -I 'node_modules|build' > DIRECTORY_ONLINE_CHESS.txt
-├── DIRECTORY_ONLINE_CHESS.txt
+.
+├── tree -I 'node_modules|build' > DIRECTORY_ONLINE_CHESS.txt
 ├── app.js
 ├── client
 │   ├── DIRECTORY_ONLINE_CHESS.txt
@@ -12,8 +12,8 @@
 │   │   ├── index.html
 │   │   └── robots.txt
 │   └── src
-│       ├── App.css
 │       ├── App.js
+│       ├── App.scss
 │       ├── chess-logo.png
 │       ├── components
 │       │   ├── Authentifications
@@ -28,15 +28,20 @@
 │       │   │   ├── BoardComponent.js
 │       │   │   ├── FallenSoldierBlock.js
 │       │   │   └── SquareElement.js
-│       │   └── Navbar.js
+│       │   ├── Navbar.js
+│       │   └── OnlineLanding.js
 │       ├── contexts
-│       │   └── AuthContext.js
+│       │   ├── AuthContext.js
+│       │   ├── NotificationContext.js
+│       │   └── SocketContext.js
 │       ├── helpers
 │       │   ├── ConfirmationDialog.js
 │       │   ├── board-initialiser.js
 │       │   ├── deserializeSquares.js
+│       │   ├── gameStatuses.js
 │       │   ├── index.js
-│       │   └── resetGame.js
+│       │   ├── resetGame.js
+│       │   └── utils.js
 │       ├── index.css
 │       ├── index.js
 │       ├── pieces
@@ -49,7 +54,9 @@
 │       │   └── rook.js
 │       ├── services
 │       │   ├── api-services
-│       │   │   └── auth.js
+│       │   │   ├── auth.js
+│       │   │   ├── game.js
+│       │   │   └── move.js
 │       │   ├── hooks
 │       │   │   └── useSocket.js
 │       │   └── redux
@@ -58,7 +65,19 @@
 │           ├── ProtectedRoute.js
 │           └── tokenUtils.js
 ├── controllers
-│   └── auth.js
+│   ├── auth
+│   │   └── authController.js
+│   ├── games
+│   │   ├── createUpdateGamesController.js
+│   │   ├── gameController.js
+│   │   ├── getAllGamesController.js
+│   │   ├── joinLeaveGamesController.js
+│   │   ├── resetCreateNewGameController.js
+│   │   └── switchGameRolesController.js
+│   └── moves
+│       ├── makeMoveController.js
+│       ├── moveController.js
+│       └── moveHelpers.js
 ├── middleware
 │   └── auth.js
 ├── models
@@ -69,7 +88,9 @@
 ├── package-lock.json
 ├── package.json
 ├── routes
-│   └── auth.js
+│   ├── auth.js
+│   ├── game.js
+│   └── move.js
 └── socket.js
 
-20 directories, 53 files
+23 directories, 71 files
