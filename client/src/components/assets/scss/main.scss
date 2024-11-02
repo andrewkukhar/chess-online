@@ -96,6 +96,7 @@
   padding-bottom: 1rem;
   overflow-y: auto;
   overflow-x: hidden;
+
   @media (max-width: 500px) {
     padding: 0.5rem 0.5rem 7rem 0.5rem;
     margin-bottom: 0;
@@ -215,10 +216,12 @@
       }
     }
 
-    // Error message styles
     .MuiAlert-root {
       background: rgba(255, 0, 0, 0.1); // Lighter background for error messages
     }
+  }
+  @media (max-width: 500px) {
+    padding: 0.5rem 0.5rem 7rem 0.5rem;
   }
 }
 
@@ -246,6 +249,9 @@
     color: #fff;
     padding: 0;
     margin: 0;
+  }
+  @media (max-width: 500px) {
+    padding: 0.5rem 0.5rem 7rem 0.5rem;
   }
 }
 
