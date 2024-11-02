@@ -9,11 +9,9 @@ export const NotificationProvider = ({ children }) => {
   const timeoutRefs = useRef([]);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-  const addNotification = (message, severity = "info") => {
+  const addNotification = (message, severity = "info", duration = 2500) => {
     const id = new Date().getTime();
-    const autoHideDuration = message.toLowerCase().includes("check")
-      ? 5000
-      : 3000;
+    const autoHideDuration = duration;
 
     setNotifications((prevNotifications) => {
       if (prevNotifications.length >= 3) {

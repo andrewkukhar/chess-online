@@ -71,6 +71,7 @@ const OnlineGame = () => {
   const [whiteFallenSoldiers, setWhiteFallenSoldiers] = useState([]);
   const [blackFallenSoldiers, setBlackFallenSoldiers] = useState([]);
   const [playerTurn, setPlayerTurn] = useState("white");
+  const [lastMove, setLastMove] = useState({ from: null, to: null });
 
   useEffect(() => {
     if (paramGameId) {
@@ -137,16 +138,21 @@ const OnlineGame = () => {
       setSquares(initialBoard);
       setWhiteFallenSoldiers(fallenWhite);
       setBlackFallenSoldiers(fallenBlack);
+
+      if (gameData?.lastMove) {
+        setLastMove(gameData.lastMove);
+      }
     }
-  }, [movesData]);
+  }, [movesData, gameData]);
 
   useEffect(() => {
     if (!socket || !gameId) return;
 
     const handleNewMove = (data) => {
       if (data.gameId === gameId) {
-        addNotification("A new move has been made.", "info");
+        addNotification("A new move has been made.", "info", 1000);
         setPlayerTurn(data.playerTurn);
+        setLastMove({ from: data.moveFrom, to: data.moveTo });
         refetchMoves?.();
         refetchGameData?.();
       }
@@ -156,7 +162,7 @@ const OnlineGame = () => {
     const handleGameOverEvent = (data) => {
       if (data.gameId === gameId) {
         addNotification(data.message, "success");
-        setWinnerName(data.winnerName);
+        refetchGameData?.();
       }
     };
     socket.on("gameOver", handleGameOverEvent);
@@ -165,7 +171,8 @@ const OnlineGame = () => {
       if (data.gameId === gameId) {
         addNotification(
           data.message || `Check! The ${data.kingColor} king is under threat.`,
-          "warning"
+          "warning",
+          3500
         );
       }
     };
@@ -259,10 +266,7 @@ const OnlineGame = () => {
     });
 
     if (result?.data && result?.data?.move) {
-      // addNotification(
-      //   result?.data?.message || `Move has been made!`,
-      //   "success"
-      // );
+      setLastMove({ from, to });
     } else {
       console.log("Error result:", result);
       addNotification(
@@ -273,8 +277,17 @@ const OnlineGame = () => {
   };
 
   const handleSquareClick = (i) => {
+    if (gameData?.winner) {
+      addNotification(
+        `The game is over. ${gameData?.winner?.username} won.`,
+        "info",
+        4500
+      );
+      return;
+    }
+
     if (playerTurn !== playerColor) {
-      addNotification(`It's not your turn.`, "info");
+      addNotification(`It's not your turn.`, "info", 1500);
       return;
     }
 
@@ -316,7 +329,7 @@ const OnlineGame = () => {
       setSelectedSquare(null);
     } else {
       setSelectedSquare(null);
-      addNotification(`Invalid move. Please try again.`, "error");
+      addNotification(`Invalid move. Please try again.`, "error", 1000);
     }
   };
 
@@ -465,7 +478,7 @@ const OnlineGame = () => {
             }),
           }}
         >
-          {winnerName ? (
+          {gameData?.winner ? (
             <Typography
               variant="h5"
               sx={{
@@ -473,7 +486,9 @@ const OnlineGame = () => {
                 color: "#ff2600",
               }}
             >
-              {`Checkmate! ${winnerName} has won the game!`}
+              {`Checkmate! ${
+                gameData?.winner?.username || "The winner"
+              } has won the game!`}
             </Typography>
           ) : (
             <>
@@ -500,6 +515,7 @@ const OnlineGame = () => {
           squares={squares}
           onClick={handleSquareClick}
           selectedSquare={selectedSquare}
+          lastMove={lastMove}
         />
       </div>
       <div className="fallen-soldiers">

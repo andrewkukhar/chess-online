@@ -17,10 +17,19 @@ const GameSchema = new mongoose.Schema({
       ref: "Move",
     },
   ],
+  lastMove: {
+    from: { type: Number, default: null },
+    to: { type: Number, default: null },
+  },
   status: {
     type: String,
     enum: ["waiting", "ongoing", "finished", "checkmate", "check"],
     default: "waiting",
+  },
+  winner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    default: null,
   },
   createdAt: {
     type: Date,

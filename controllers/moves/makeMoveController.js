@@ -101,9 +101,10 @@ exports.makeMove = async (req, res) => {
       if (!hasLegalMoves) {
         checkmate = true;
         game.status = "checkmate";
+        game.winner = userId;
       }
     }
-
+    game.lastMove = { from: newMove.from, to: newMove.to };
     game.moves.push(newMove._id);
     await game.save();
 
@@ -117,6 +118,9 @@ exports.makeMove = async (req, res) => {
       io.to(socketId).emit("newMove", {
         gameId: game._id,
         moveId: newMove._id,
+        moveFrom: newMove.from,
+        moveTo: newMove.to,
+        lastMove: game.lastMove,
         game: game,
         playerTurn: updatedPlayerTurn,
         check,

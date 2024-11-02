@@ -39,13 +39,19 @@
     padding: 0;
     padding-bottom: 0.5rem;
     overflow: hidden;
-
     @media (max-width: 600px) {
       padding: 0.5rem 0.5rem 1.5rem 0.5rem;
     }
   }
 }
 
+.some-test {
+  background: linear-gradient(
+    0deg,
+    rgba(188, 231, 138, 0.35),
+    rgba(100, 126, 50, 0.35)
+  );
+}
 .navbar {
   width: 100%;
   max-width: 40rem;

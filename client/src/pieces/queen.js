@@ -55,8 +55,21 @@ export default class Queen extends Piece {
     const colStep = colDest > colSrc ? 1 : colDest < colSrc ? -1 : 0;
 
     let current = src + rowStep * 8 + colStep;
+    let safetyCounter = 0;
 
     while (current !== dest) {
+      if (safetyCounter++ > 64) {
+        console.error(
+          "Exceeded path calculation limit - possible infinite loop."
+        );
+        break;
+      }
+
+      if (current < 0 || current >= 64) {
+        console.error("Path calculation went out of board bounds.");
+        break;
+      }
+
       path.push(current);
       current += rowStep * 8 + colStep;
     }

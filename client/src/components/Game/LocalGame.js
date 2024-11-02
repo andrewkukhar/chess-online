@@ -85,9 +85,35 @@ const LocalGame = () => {
     }
     return "";
   });
+  const [lastMove, setLastMove] = useState({ from: null, to: null });
+
   const [selectedSquare, setSelectedSquare] = useState(null);
 
+  const hasAnyLegalMoves = (squares, player) => {
+    for (let src = 0; src < squares.length; src++) {
+      const piece = squares[src];
+      if (piece && piece.getPlayer() === player) {
+        for (let dest = 0; dest < squares.length; dest++) {
+          if (piece.isMovePossible(src, dest, squares)) {
+            const newSquares = [...squares];
+            newSquares[dest] = piece;
+            newSquares[src] = null;
+            if (!isCheckForPlayer(newSquares, player)) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  };
+
   const handleClick = (i) => {
+    if (selectedSquare === null && !squares[i]) {
+      addNotification(`Please select a piece to move.`, "info");
+      return;
+    }
+
     setHistory((prevHistory) => [
       ...prevHistory,
       {
@@ -107,29 +133,29 @@ const LocalGame = () => {
     if (selectedSquare === null) {
       if (!clickedPiece || clickedPiece.player !== player) {
         addNotification(
-          `Wrong selection. Choose player ${player} pieces.`,
-          "error"
+          `Invalid selection. Please select your (${turn}) piece.`,
+          "warning"
         );
       } else {
         setSelectedSquare(i);
-        addNotification("Piece selected. Choose destination.", "info");
+        // addNotification("Piece selected. Choose destination.", "info");
       }
       return;
     }
 
     if (i === selectedSquare) {
       setSelectedSquare(null);
+      addNotification("Selection cleared.", "info");
       return;
     }
 
     if (clickedPiece && clickedPiece.player === player) {
       setSelectedSquare(i);
-      addNotification("Piece selected. Choose destination.", "info");
+      // addNotification("Piece selected. Choose destination.", "info");
       return;
     }
 
     const sourcePiece = newSquares[selectedSquare];
-
     const isMovePossible = sourcePiece.isMovePossible(
       selectedSquare,
       i,
@@ -154,7 +180,7 @@ const LocalGame = () => {
       const isCheckMe = isCheckForPlayer(newSquares, player);
       if (isCheckMe) {
         addNotification(
-          "Check! Choose a valid move to protect your King.",
+          "Check! This move leaves your King in danger. Choose a different move.",
           "warning"
         );
 
@@ -169,10 +195,31 @@ const LocalGame = () => {
         setTurn(nextTurn);
         setStatus("");
         setSelectedSquare(null);
-        addNotification(
-          `${nextTurn.charAt(0).toUpperCase() + nextTurn.slice(1)}'s turn`,
-          "success"
-        );
+        setLastMove({ from: selectedSquare, to: i });
+        const isOpponentInCheck = isCheckForPlayer(newSquares, nextPlayer);
+        const hasLegalMoves = hasAnyLegalMoves(newSquares, nextPlayer);
+
+        if (!hasLegalMoves) {
+          if (isOpponentInCheck) {
+            const winner = turn === "white" ? "White" : "Black";
+            setStatus("checkmate");
+            addNotification(`Checkmate! ${winner} wins the game.`, "success");
+          } else {
+            addNotification("Stalemate! The game is a draw.", "info");
+          }
+        } else if (isOpponentInCheck) {
+          addNotification(
+            `Check! ${
+              nextTurn.charAt(0).toUpperCase() + nextTurn.slice(1)
+            } is in check.`,
+            "warning"
+          );
+        } else {
+          addNotification(
+            `${nextTurn.charAt(0).toUpperCase() + nextTurn.slice(1)}'s turn.`,
+            "success"
+          );
+        }
       }
     } else {
       setSelectedSquare(null);
@@ -363,6 +410,7 @@ const LocalGame = () => {
           squares={squares}
           onClick={handleClick}
           selectedSquare={selectedSquare}
+          lastMove={lastMove}
         />
       </div>
       <div className="fallen-soldiers">

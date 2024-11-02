@@ -65,6 +65,7 @@ exports.getGame = async (req, res) => {
   try {
     const game = await Game.findById(gameId)
       .populate("players")
+      .populate("winner")
       .populate({
         path: "moves",
         populate: { path: "player" },
