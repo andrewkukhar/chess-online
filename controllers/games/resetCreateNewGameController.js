@@ -32,8 +32,20 @@ exports.resetGame = async (req, res) => {
     game.status = "finished";
     await game.save();
 
+    let newGameName;
+    const rematchRegex = /(Rematch\s(\d+(\.\d+)?))$/;
+    const match = game.name.match(rematchRegex);
+
+    if (match) {
+      const currentVersion = parseFloat(match[2]);
+      const newVersion = (currentVersion + 1).toFixed(1);
+      newGameName = game.name.replace(rematchRegex, `Rematch ${newVersion}`);
+    } else {
+      newGameName = `${game.name} Rematch 1.0`;
+    }
+
     const newGame = new Game({
-      name: `${game.name} (Rematch)`,
+      name: newGameName,
       players: game.players,
       status: "ongoing",
     });
