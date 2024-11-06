@@ -16,15 +16,16 @@
 │       ├── App.scss
 │       ├── chess-logo.png
 │       ├── components
-│       │   ├── Authentifications
+│       │   ├── authentifications
 │       │   │   ├── Login.js
 │       │   │   └── Register.js
 │       │   ├── Game
 │       │   │   ├── CreateGame.js
+│       │   │   ├── InvitationDialog.js
 │       │   │   ├── JoinGame.js
 │       │   │   ├── LocalGame.js
 │       │   │   └── OnlineGame.js
-│       │   ├── GameElements
+│       │   ├── game-elements
 │       │   │   ├── BoardComponent.js
 │       │   │   ├── FallenSoldierBlock.js
 │       │   │   └── SquareElement.js
@@ -43,7 +44,6 @@
 │       │   ├── ConfirmationDialog.js
 │       │   ├── board-initialiser.js
 │       │   ├── deserializeSquares.js
-│       │   ├── gameStatuses.js
 │       │   ├── index.js
 │       │   ├── resetGame.js
 │       │   └── utils.js
@@ -60,6 +60,7 @@
 │       ├── services
 │       │   ├── api-services
 │       │   │   ├── auth.js
+│       │   │   ├── email.js
 │       │   │   ├── game.js
 │       │   │   └── move.js
 │       │   ├── hooks
@@ -70,8 +71,12 @@
 │           ├── ProtectedRoute.js
 │           └── tokenUtils.js
 ├── controllers
+│   ├── admin
+│   │   └── userController.js
 │   ├── auth
 │   │   └── authController.js
+│   ├── emails
+│   │   └── emailController.js
 │   ├── games
 │   │   ├── createUpdateGamesController.js
 │   │   ├── gameController.js
@@ -84,7 +89,8 @@
 │       ├── moveController.js
 │       └── moveHelpers.js
 ├── middleware
-│   └── auth.js
+│   ├── auth.js
+│   └── permission.js
 ├── models
 │   ├── Game.js
 │   ├── Move.js
@@ -94,8 +100,9 @@
 ├── package.json
 ├── routes
 │   ├── auth.js
+│   ├── email.js
 │   ├── game.js
 │   └── move.js
 └── socket.js
 
-25 directories, 74 files
+27 directories, 79 files

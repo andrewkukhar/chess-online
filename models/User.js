@@ -19,6 +19,20 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  firstname: {
+    type: String,
+    trim: true,
+  },
+  lastname: {
+    type: String,
+    trim: true,
+  },
+  role: {
+    type: String,
+    enum: ["player", "watcher", "ak-admin", "admin"],
+    default: "player",
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("User", UserSchema);

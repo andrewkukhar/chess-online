@@ -26,18 +26,24 @@ let corsOptions = {
   },
   credentials: true,
 };
-// Import routes
+
 const authRoutes = require("./routes/auth");
+const checkRoutes = require("./routes/check");
+const userRoutes = require("./routes/user");
 const gameRoutes = require("./routes/game");
 const moveRoutes = require("./routes/move");
+const emailRoutes = require("./routes/email");
 
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/check", checkRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/games", gameRoutes);
 app.use("/api/moves", moveRoutes);
+app.use("/api/emails", emailRoutes);
 
 app.use("/", express.static(path.join(__dirname, "client", "build")));
 app.get("*", (req, res) => {
