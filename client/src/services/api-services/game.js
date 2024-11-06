@@ -1,4 +1,4 @@
-// client/src/services/api-services/auth.js
+// client/src/services/api-services/game.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const gameApi = createApi({
@@ -59,6 +59,16 @@ export const gameApi = createApi({
       skip: (gameId) => !gameId,
       providesTags: (result, error, gameId) => [{ type: "Game", id: gameId }],
     }),
+    getAllGamesByUser: builder.query({
+      query: (status) => ({
+        url: `get-all-user-games${
+          status && status !== "All" ? `?status=${status}` : ""
+        }`,
+        method: "GET",
+      }),
+      skip: (userId) => !userId,
+      providesTags: (result, error, gameId) => [{ type: "Game", id: gameId }],
+    }),
     getAllGames: builder.query({
       query: (status) => ({
         url: `get-all-games${
@@ -94,6 +104,7 @@ export const {
   useLeaveGameMutation,
   useRemoveGameMutation,
   useGetGameQuery,
+  useGetAllGamesByUserQuery,
   useGetAllGamesQuery,
   useResetGameMutation,
   useSwitchPlayerRolesMutation,

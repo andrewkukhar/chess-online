@@ -1,4 +1,4 @@
-// client/src/services/api-services/auth.js
+// client/src/services/api-services/move.js
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const moveApi = createApi({

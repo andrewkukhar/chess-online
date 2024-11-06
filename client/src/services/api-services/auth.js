@@ -29,13 +29,19 @@ export const authApi = createApi({
         body: { email, password },
       }),
     }),
-    getMe: builder.query({
-      query: (userInfo) => ({
-        url: "me",
+    loginViaToken: builder.mutation({
+      query: ({ token }) => ({
+        url: "login-via-token",
+        method: "POST",
+        body: { token },
       }),
     }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetMeQuery } = authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useLoginViaTokenMutation,
+} = authApi;
 export default authApi;

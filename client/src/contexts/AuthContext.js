@@ -7,9 +7,11 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token"));
   const [userId, setUserId] = useState(() => localStorage.getItem("userId"));
-
   const [username, setUsername] = useState(() =>
     localStorage.getItem("username")
+  );
+  const [userrole, setUserrole] = useState(() =>
+    localStorage.getItem("userrole")
   );
 
   const [isTokenReady, setIsTokenReady] = useState(false);
@@ -37,18 +39,21 @@ export const AuthProvider = ({ children }) => {
 
     if (userId) localStorage.setItem("userId", userId);
     if (username) localStorage.setItem("username", username);
-  }, [token, userId, username]);
+    if (userrole) localStorage.setItem("userrole", userrole);
+  }, [token, userId, username, userrole]);
 
   const handleLogout = () => {
     localStorage.clear();
     setToken(null);
     setUserId(null);
     setUsername(null);
+    setUserrole(null);
     setIsTokenReady(false);
 
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("username");
+    localStorage.removeItem("userrole");
     localStorage.removeItem("currentGameId");
   };
 
@@ -59,14 +64,17 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const handleLogin = (data) => {
-    const { token, userId, username } = data;
+    const { token, userId, username, userrole } = data;
+    // console.log("data", data);
     setToken(token);
     setUserId(userId);
     setUsername(username);
+    setUserrole(userrole);
 
     localStorage.setItem("token", token);
     localStorage.setItem("userId", userId);
     localStorage.setItem("username", username);
+    localStorage.setItem("userrole", userrole);
     setIsTokenReady(true);
   };
 
@@ -76,6 +84,7 @@ export const AuthProvider = ({ children }) => {
         token,
         userId,
         username,
+        userrole,
         isTokenReady,
         isCheckingToken,
         handleLogin,

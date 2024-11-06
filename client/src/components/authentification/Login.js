@@ -25,10 +25,9 @@ const Login = () => {
     try {
       const response = await loginMutation({ email, password }).unwrap();
       const { token, user } = response;
-      const { userId, username } = user;
+      const { userId, username, userrole } = user;
 
-      handleLogin({ token, userId, username });
-
+      handleLogin({ token, userId, username, userrole });
       setTimeout(() => {
         navigate("/online");
       }, 1000);

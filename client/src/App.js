@@ -7,15 +7,18 @@ import {
   Navigate,
 } from "react-router-dom";
 import { NotificationProvider } from "./contexts/NotificationContext";
-import CreateGame from "./components/Game/CreateGame";
-import JoinGame from "./components/Game/JoinGame";
-import LocalGame from "./components/Game/LocalGame";
-import OnlineGame from "./components/Game/OnlineGame";
-import Login from "./components/Authentifications/Login";
-import Register from "./components/Authentifications/Register";
+import AdminDashboard from "./components/ak-admin/AdminDashboard";
+import CreateGame from "./components/game/CreateGame";
+import JoinGame from "./components/game/JoinGame";
+import LocalGame from "./components/game/LocalGame";
+import OnlineGame from "./components/game/OnlineGame";
+import Login from "./components/authentification/Login";
+import Register from "./components/authentification/Register";
 import Navbar from "./components/Navbar";
 import OnlineLanding from "./components/OnlineLanding";
 import ProtectedRoute from "./utils/ProtectedRoute";
+import LoginViaToken from "./services/hooks/LoginViaToken";
+
 import "./App.scss";
 
 const App = () => {
@@ -31,6 +34,7 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/localgame" element={<LocalGame />} />
+              <Route path="/login-via-token" element={<LoginViaToken />} />
               <Route
                 path="/online"
                 element={
@@ -60,6 +64,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <OnlineGame />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin-dashboard"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
                   </ProtectedRoute>
                 }
               />

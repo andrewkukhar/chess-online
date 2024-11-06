@@ -7,9 +7,10 @@ import Box from "@mui/material/Box";
 
 const ProtectedRoute = ({ children }) => {
   const { token, isTokenReady, isCheckingToken } = useContext(AuthContext);
+
   // console.log("token", token);
   // console.log("isTokenReady", isTokenReady);
-  if (isCheckingToken) {
+  if (token && isCheckingToken && !isTokenReady) {
     return (
       <Box
         sx={{
@@ -25,7 +26,7 @@ const ProtectedRoute = ({ children }) => {
   }
 
   if (!token || !isTokenReady) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return children;

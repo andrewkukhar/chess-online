@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { NotificationContext } from "../contexts/NotificationContext";
 import {
-  useGetAllGamesQuery,
+  useGetAllGamesByUserQuery,
   useLeaveGameMutation,
   useRemoveGameMutation,
 } from "../services/api-services/game";
@@ -39,7 +39,7 @@ const OnlineLanding = () => {
     data: gamesData,
     isLoading,
     isError,
-  } = useGetAllGamesQuery(gameFilter, {
+  } = useGetAllGamesByUserQuery(gameFilter, {
     skip: !isTokenReady || !userId | !token,
   });
 

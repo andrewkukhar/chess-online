@@ -13,7 +13,7 @@
     ├── App.scss
     ├── chess-logo.png
     ├── components
-    │   ├── Authentifications
+    │   ├── authentifications
     │   │   ├── Login.js
     │   │   └── Register.js
     │   ├── Game
@@ -21,7 +21,7 @@
     │   │   ├── JoinGame.js
     │   │   ├── LocalGame.js
     │   │   └── OnlineGame.js
-    │   ├── GameElements
+    │   ├── game-elements
     │   │   ├── BoardComponent.js
     │   │   ├── FallenSoldierBlock.js
     │   │   └── SquareElement.js

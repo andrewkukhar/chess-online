@@ -1,6 +1,7 @@
 // src/components/Navbar.js
 import React, { useContext, useState } from "react";
-import { useGetAllGamesQuery } from "../services/api-services/game";
+import { useGetAllGamesByUserQuery } from "../services/api-services/game";
+import { useCheckAAdminRoleQuery } from "../services/api-services/check";
 import {
   Button,
   Typography,
@@ -19,10 +20,16 @@ import HomeIcon from "@mui/icons-material/Home";
 import PublicIcon from "@mui/icons-material/Public";
 import MobileOffIcon from "@mui/icons-material/MobileOff";
 import LoginIcon from "@mui/icons-material/Login";
+import SettingsIcon from "@mui/icons-material/Settings";
 
 const Navbar = () => {
-  const { token, username, isTokenReady, userId, handleLogout } =
+  const { token, username, userrole, isTokenReady, userId, handleLogout } =
     useContext(AuthContext);
+  const isAdmin = userrole?.includes("admin");
+  const { data: isValidRole } = useCheckAAdminRoleQuery(userId, {
+    skip: !isTokenReady || !userId || !token || !isAdmin,
+  });
+  // console.log("NAVBAR isValidRole", isValidRole);
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -33,7 +40,7 @@ const Navbar = () => {
     data: gamesData,
     isLoading,
     isError,
-  } = useGetAllGamesQuery(undefined, {
+  } = useGetAllGamesByUserQuery(undefined, {
     skip: !isTokenReady || !userId | !token,
   });
 
@@ -111,6 +118,21 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="navbar-appbar-body">
+            {isValidRole && (
+              <Tooltip title="Admin Dashboard" placement="bottom">
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/admin-dashboard"
+                  sx={isSmallScreen ? buttonStyle : null}
+                  startIcon={
+                    isSmallScreen ? <SettingsIcon sx={iconButtonStyle} /> : null
+                  }
+                >
+                  {isSmallScreen ? null : "AD"}
+                </Button>
+              </Tooltip>
+            )}
             <Tooltip title={`${username} menu`}>
               <IconButton
                 color="inherit"

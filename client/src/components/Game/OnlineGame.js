@@ -22,11 +22,12 @@ import { Restore } from "@mui/icons-material";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useSocket } from "../../contexts/SocketContext";
 import { NotificationContext } from "../../contexts/NotificationContext";
-import BoardComponent from "../GameElements/BoardComponent";
-import FallenSoldierBlock from "../GameElements/FallenSoldierBlock";
+import BoardComponent from "../game-elements/BoardComponent";
+import FallenSoldierBlock from "../game-elements/FallenSoldierBlock";
 import initialiseChessBoard from "../../helpers/board-initialiser";
 import { resetGame } from "../../helpers/resetGame";
 import ConfirmationDialog from "../../helpers/ConfirmationDialog";
+import InvitatioDialog from "./InvitationDialog";
 
 const OnlineGame = () => {
   const { gameId: paramGameId } = useParams();
@@ -72,6 +73,7 @@ const OnlineGame = () => {
   const [blackFallenSoldiers, setBlackFallenSoldiers] = useState([]);
   const [playerTurn, setPlayerTurn] = useState("white");
   const [lastMove, setLastMove] = useState({ from: null, to: null });
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (paramGameId) {
@@ -374,6 +376,14 @@ const OnlineGame = () => {
     return gameData.players[playerIndex]?.username || color;
   };
 
+  const handleInviteClick = () => {
+    setInviteDialogOpen(true);
+  };
+
+  const handleCloseInviteDialog = () => {
+    setInviteDialogOpen(false);
+  };
+
   if (gameLoading || movesLoading) {
     return (
       <Box
@@ -417,6 +427,14 @@ const OnlineGame = () => {
             disabled={!gameId}
           >
             Copy Game Link
+          </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={handleInviteClick}
+            disabled={!gameId}
+          >
+            Invite by Email
           </Button>
           {shouldShowSwitchOption && (
             <Button
@@ -542,6 +560,11 @@ const OnlineGame = () => {
           confirmDialog.action === "resetGame" ? "Restart" : "Switch Roles"
         }
         cancelText="Cancel"
+      />
+      <InvitatioDialog
+        open={inviteDialogOpen}
+        onClose={handleCloseInviteDialog}
+        gameId={gameId}
       />
     </div>
   );
