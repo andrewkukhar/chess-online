@@ -8,10 +8,10 @@ import {
 } from "react-router-dom";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import AdminDashboard from "./components/ak-admin/AdminDashboard";
-import CreateGame from "./components/game/CreateGame";
-import JoinGame from "./components/game/JoinGame";
-import LocalGame from "./components/game/LocalGame";
-import OnlineGame from "./components/game/OnlineGame";
+import CreateGame from "./components/games/CreateGame";
+import JoinGame from "./components/games/JoinGame";
+import LocalGame from "./components/games/LocalGame";
+import OnlineGame from "./components/games/OnlineGame";
 import Login from "./components/authentification/Login";
 import Register from "./components/authentification/Register";
 import Navbar from "./components/Navbar";
