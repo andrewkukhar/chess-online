@@ -10,7 +10,11 @@ import {
   Box,
   Alert,
   CircularProgress,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const Register = () => {
   const { addNotification } = useContext(NotificationContext);
@@ -19,6 +23,7 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [registerMutation, { isLoading, error }] = useRegisterMutation();
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,6 +61,10 @@ const Register = () => {
         "error"
       );
     }
+  };
+
+  const handleTogglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   return (
@@ -115,12 +124,23 @@ const Register = () => {
             fullWidth
             name="password"
             label="Password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             id="password"
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleTogglePasswordVisibility}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
               className: "MuiTextField-root",
             }}
             InputLabelProps={{

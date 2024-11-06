@@ -1,6 +1,5 @@
 // src/components/Navbar.js
 import React, { useContext, useState } from "react";
-import { useGetAllGamesByUserQuery } from "../services/api-services/game";
 import { useCheckAAdminRoleQuery } from "../services/api-services/check";
 import {
   Button,
@@ -9,8 +8,9 @@ import {
   IconButton,
   Menu,
   MenuItem,
-  CircularProgress,
   useMediaQuery,
+  Drawer,
+  Divider,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
@@ -21,6 +21,7 @@ import PublicIcon from "@mui/icons-material/Public";
 import MobileOffIcon from "@mui/icons-material/MobileOff";
 import LoginIcon from "@mui/icons-material/Login";
 import SettingsIcon from "@mui/icons-material/Settings";
+import UserSettingsDrawer from "./users/UserSettingsDrawer";
 
 const Navbar = () => {
   const { token, username, userrole, isTokenReady, userId, handleLogout } =
@@ -33,16 +34,8 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
-
-  const {
-    data: gamesData,
-    isLoading,
-    isError,
-  } = useGetAllGamesByUserQuery(undefined, {
-    skip: !isTokenReady || !userId | !token,
-  });
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -55,6 +48,15 @@ const Navbar = () => {
   const onLogout = () => {
     handleLogout();
     navigate("/login");
+  };
+
+  const handleDrawerOpen = () => {
+    setAnchorEl(null);
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
   };
 
   const iconStyle = { fontSize: "2.5rem", width: "2.5rem" };
@@ -156,31 +158,40 @@ const Navbar = () => {
               MenuListProps={{
                 "aria-labelledby": "user-games-button",
               }}
+              PaperProps={{
+                sx: { width: "25rem" },
+              }}
             >
-              <Typography variant="subtitle1" sx={{ padding: "0.5rem 1rem" }}>
-                Your Games
+              <Typography
+                variant="subtitle1"
+                sx={{ padding: "0.5rem 1rem", textAlign: "center" }}
+              >
+                Account Settings
               </Typography>
-              {isLoading ? (
-                <MenuItem>
-                  <CircularProgress size={24} />
-                </MenuItem>
-              ) : isError ? (
-                <MenuItem disabled>Error loading games</MenuItem>
-              ) : gamesData && gamesData?.length > 0 ? (
-                gamesData?.map((game) => (
-                  <MenuItem
-                    key={game?._id}
-                    component={Link}
-                    to={`/game/${game?._id}`}
-                    onClick={handleMenuClose}
-                  >
-                    {game?.name || `Game ${game?._id}`}
-                  </MenuItem>
-                ))
-              ) : (
-                <MenuItem disabled>No games found</MenuItem>
-              )}
+              <Divider />
+              <MenuItem
+                component={Button}
+                onClick={handleDrawerOpen}
+                sx={{ width: "100%" }}
+              >
+                Settings
+              </MenuItem>
             </Menu>
+            <Drawer
+              anchor="bottom"
+              open={drawerOpen}
+              onClose={handleDrawerClose}
+              PaperProps={{
+                sx: {
+                  height: "calc(100% - 4.5rem)",
+                  width: "100%",
+                  p: 0,
+                  m: 0,
+                },
+              }}
+            >
+              <UserSettingsDrawer handleClose={handleDrawerClose} />
+            </Drawer>
             <Tooltip title="Logout" placement="bottom">
               <IconButton
                 color="inherit"

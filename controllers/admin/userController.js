@@ -1,6 +1,7 @@
 // controllers/admin/userController.js
 const User = require("../../models/User");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 // Get all users (Admin only)
 exports.getAllUsers = async (req, res) => {
@@ -34,13 +35,30 @@ exports.getUserById = async (req, res) => {
 // Update user by ID (Admin or user can update their own data)
 exports.updateUserById = async (req, res) => {
   const { userId } = req.params;
+  const { oldPassword, newPassword, ...rest } = req.body;
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(400).json({ message: "Invalid User ID." });
   }
 
   try {
-    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (oldPassword && newPassword) {
+      const isMatch = await bcrypt.compare(oldPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Old password is incorrect." });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      rest.password = hashedPassword;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(userId, rest, {
       new: true,
       runValidators: true,
     });

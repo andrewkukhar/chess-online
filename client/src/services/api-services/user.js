@@ -27,6 +27,7 @@ export const userApi = createApi({
         url: `get-user/${userId}`,
         method: "GET",
       }),
+      skip: (userId) => !userId,
       providesTags: (result, error, userId) => [{ type: "User", id: userId }],
     }),
     updateUserById: builder.mutation({
