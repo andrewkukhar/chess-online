@@ -109,6 +109,15 @@ const UsersTab = () => {
           columns={columns}
           checkboxSelection
           disableRowSelectionOnClick
+          sx={{
+            color: "#ffffff",
+            ".MuiDataGrid-cell": {
+              color: "#ffffff",
+            },
+            ".MuiDataGrid-columnHeaders": {
+              color: "#000",
+            },
+          }}
         />
       ) : isLoading ? (
         <CircularProgress />

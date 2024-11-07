@@ -48,7 +48,7 @@ exports.createGame = async (req, res) => {
 
 /**
  * Update game details.
- * @route PUT /api/game/:gameId
+ * @route PUT /api/games/update-game/:gameId
  * @access Private
  */
 exports.updateGame = async (req, res) => {

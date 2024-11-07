@@ -14,6 +14,16 @@ export const NotificationProvider = ({ children }) => {
     const autoHideDuration = duration;
 
     setNotifications((prevNotifications) => {
+      const lastNotification = prevNotifications[prevNotifications.length - 1];
+      if (
+        lastNotification &&
+        lastNotification.message === message &&
+        lastNotification.severity === severity &&
+        id - lastNotification.id < 2000
+      ) {
+        return prevNotifications;
+      }
+
       if (prevNotifications.length >= 3) {
         prevNotifications.shift();
       } else if (isSmallScreen && prevNotifications.length >= 2) {

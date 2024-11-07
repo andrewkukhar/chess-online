@@ -3,10 +3,14 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 const permission = require("../middleware/permission");
-const { removeGame, getGame } = require("../controllers/games/gameController");
+const {
+  removeGame,
+  removeAllGames,
+} = require("../controllers/games/gameController");
 const {
   getAllGamesByUser,
   getAllGames,
+  getGame,
 } = require("../controllers/games/getAllGamesController");
 const {
   switchPlayerRoles,
@@ -14,6 +18,10 @@ const {
 const {
   resetGame,
 } = require("../controllers/games/resetCreateNewGameController");
+const {
+  joinGameRoom,
+  updatePlayerGameRoomStatus,
+} = require("../controllers/games/gameRoomController");
 const {
   joinGame,
   leaveGame,
@@ -23,7 +31,7 @@ const {
   updateGame,
 } = require("../controllers/games/createUpdateGamesController");
 
-// @route   POST /api/game/create
+// @route   POST /api/games/create
 // @desc    Create a new game
 // @access  Private
 router.post(
@@ -33,7 +41,7 @@ router.post(
   createGame
 );
 
-// @route   PUT /api/game/:gameId
+// @route   PUT /api/games/update-game/:gameId
 // @desc    Update game details
 // @access  Private
 router.put(
@@ -43,7 +51,7 @@ router.put(
   updateGame
 );
 
-// @route   POST /api/game/join
+// @route   POST /api/games/join-game
 // @desc    Join an existing game
 // @access  Private
 router.post(
@@ -53,7 +61,7 @@ router.post(
   joinGame
 );
 
-// @route   POST /api/game/leave
+// @route   POST /api/games/leave-game
 // @desc    Leave a game
 // @access  Private
 router.post(
@@ -63,7 +71,7 @@ router.post(
   leaveGame
 );
 
-// @route   DELETE /api/game/:gameId
+// @route   DELETE /api/games/:gameId
 // @desc    Remove a game
 // @access  Private
 router.delete(
@@ -71,6 +79,16 @@ router.delete(
   auth,
   permission(["admin", "ak-admin", "player", "watcher"]),
   removeGame
+);
+
+// @route   DELETE /api/games/delete-all
+// @desc    Remove a game
+// @access  Private
+router.delete(
+  "/delete-all",
+  auth,
+  permission(["admin", "ak-admin"]),
+  removeAllGames
 );
 
 // @route   GET /api/games/:gameId
@@ -103,7 +121,7 @@ router.get(
   getAllGames
 );
 
-// @route   POST /api/game/reset-game
+// @route   POST /api/games/reset-game
 // @desc    Reset a game
 // @access  Private
 router.post(
@@ -121,6 +139,26 @@ router.post(
   auth,
   permission(["admin", "ak-admin", "player", "watcher"]),
   switchPlayerRoles
+);
+
+// @route   POST /api/games/update-player-game-room-status/:gameId
+// @desc    Update update Player status in the game room
+// @access  Private
+router.post(
+  "/update-player-game-room-status/:gameId",
+  auth,
+  permission(["admin", "ak-admin", "player", "watcher"]),
+  updatePlayerGameRoomStatus
+);
+
+// @route   POST /api/games/join-game-room/:gameId
+// @desc    Update player status to join game room
+// @access  Private
+router.post(
+  "/join-game-room/:gameId",
+  auth,
+  permission(["admin", "ak-admin", "player", "watcher"]),
+  joinGameRoom
 );
 
 module.exports = router;

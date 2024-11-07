@@ -12,6 +12,7 @@ const io = socket.getIO();
 exports.removeGame = async (req, res) => {
   const { gameId } = req.params;
   const userId = req.user.userId;
+  const userrole = req.user.role;
 
   if (!mongoose.Types.ObjectId.isValid(gameId)) {
     return res.status(400).json({ message: "Invalid Game ID." });
@@ -24,7 +25,10 @@ exports.removeGame = async (req, res) => {
     }
 
     // Check if the requester is the host (first player)
-    if (game.players[0].player.toString() !== userId) {
+    if (
+      userrole !== "ak-admin" &&
+      game.players[0].player.toString() !== userId
+    ) {
       return res
         .status(403)
         .json({ message: "Unauthorized to remove this game." });
@@ -50,95 +54,28 @@ exports.removeGame = async (req, res) => {
 };
 
 /**
- * Get a specific get by ID.
- * @route GET /api/games/:gameId
+ * Remove all games.
+ * @route DELETE /api/games/delete-all
  * @access Private
  */
-exports.getGame = async (req, res) => {
-  const { gameId } = req.params;
+exports.removeAllGames = async (req, res) => {
   const userId = req.user.userId;
-
-  if (!mongoose.Types.ObjectId.isValid(gameId)) {
-    return res.status(400).json({ message: "Invalid Game ID." });
-  }
-
-  try {
-    const game = await Game.findById(gameId)
-      .populate("players.player")
-      .populate("winner")
-      .populate({
-        path: "moves",
-        populate: { path: "player" },
-      });
-
-    if (!game) {
-      return res.status(404).json({ message: "Game not found." });
-    }
-
-    const player = game.players.find((p) => p.player._id.toString() === userId);
-    if (!player) {
-      return res
-        .status(403)
-        .json({ message: "Unauthorized to view this game." });
-    }
-
-    player.isOnlineInGameRoom = true;
-    await game.save();
-
-    const otherPlayers = game.players.filter(
-      (p) => p.player._id.toString() !== userId
-    );
-    otherPlayers.forEach((otherPlayer) => {
-      const socketId = socket.getUserSocketId(
-        otherPlayer.player._id.toString()
-      );
-      if (socketId) {
-        io.to(socketId).emit("playerRoomStatusUpdated", {
-          gameId,
-          userId,
-          isOnlineInGameRoom: true,
-        });
-      }
-    });
-
-    res.status(200).json(game);
-  } catch (err) {
-    console.error("Error in getGame:", err.message);
-    res.status(500).json({ message: "Server error while retrieving move." });
-  }
-};
-
-/**
- * Get all games that belong to the authenticated user.
- * @route GET /api/games/get-all-games
- * @access Private
- */
-exports.getAllGames = async (req, res) => {
-  const userId = req.user.userId;
-  // console.log("userId", userId);
 
   if (!mongoose.Types.ObjectId.isValid(userId)) {
     return res.status(400).json({ message: "Invalid user ID." });
   }
-  try {
-    const games = await Game.find({ players: userId })
-      .populate("players")
-      .populate({
-        path: "moves",
-        populate: { path: "player" },
-      })
-      .sort({ createdAt: -1 });
 
-    if (!games || games.length === 0) {
-      return res.status(200).json({
-        message: "No games found for the authenticated user.",
-        games: [],
-      });
+  try {
+    const games = await Game.find({ "players.player": userId });
+    if (!games.length) {
+      return res.status(404).json({ message: "No games found." });
     }
 
-    res.status(200).json(games);
+    await Game.deleteMany({ "players.player": userId });
+
+    res.status(200).json({ message: "All games deleted successfully." });
   } catch (err) {
-    console.error("Error in getAllGames:", err.message);
-    res.status(500).json({ message: "Server error while retrieving move." });
+    console.error("Error in removeAllGames:", err.message);
+    res.status(500).json({ message: "Server error while removing all games." });
   }
 };

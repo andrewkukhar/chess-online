@@ -71,7 +71,28 @@ const JoinGame = () => {
         fullWidth
         value={gameId}
         onChange={(e) => setGameId(e.target.value)}
-        sx={{ marginTop: "2rem", marginBottom: "1rem" }}
+        sx={{
+          marginTop: "2rem",
+          marginBottom: "1rem",
+          color: "#ffffff",
+          "& .MuiInputBase-root": {
+            color: "#ffffff",
+          },
+          "& .MuiInputLabel-root": {
+            color: "rgba(255, 255, 255, 0.7)",
+          },
+          "& .MuiOutlinedInput-root": {
+            "& fieldset": {
+              borderColor: "rgba(255, 255, 255, 0.5)",
+            },
+            "&:hover fieldset": {
+              borderColor: "#ffffff",
+            },
+            "&.Mui-focused fieldset": {
+              borderColor: "#ffffff",
+            },
+          },
+        }}
       />
       <Button
         variant="contained"

@@ -54,6 +54,13 @@ export const gameApi = createApi({
       }),
       invalidatesTags: ["Game"],
     }),
+    removeAllGames: builder.mutation({
+      query: () => ({
+        url: "delete-all",
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Game"],
+    }),
     getGame: builder.query({
       query: (gameId) => `get-game/${gameId}`,
       skip: (gameId) => !gameId,
@@ -94,6 +101,20 @@ export const gameApi = createApi({
       }),
       invalidatesTags: ["Game"],
     }),
+    updatePlayerGameRoomStatus: builder.mutation({
+      query: ({ gameId }) => ({
+        url: `update-player-game-room-status/${gameId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Game"],
+    }),
+    joinGameRoom: builder.mutation({
+      query: ({ gameId }) => ({
+        url: `join-game-room/${gameId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Game"],
+    }),
   }),
 });
 
@@ -103,10 +124,13 @@ export const {
   useJoinGameMutation,
   useLeaveGameMutation,
   useRemoveGameMutation,
+  useRemoveAllGamesMutation,
   useGetGameQuery,
   useGetAllGamesByUserQuery,
   useGetAllGamesQuery,
   useResetGameMutation,
   useSwitchPlayerRolesMutation,
+  useUpdatePlayerGameRoomStatusMutation,
+  useJoinGameRoomMutation,
 } = gameApi;
 export default gameApi;

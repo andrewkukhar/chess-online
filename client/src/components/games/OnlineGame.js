@@ -9,6 +9,8 @@ import {
   useGetGameQuery,
   useResetGameMutation,
   useSwitchPlayerRolesMutation,
+  useUpdatePlayerGameRoomStatusMutation,
+  useJoinGameRoomMutation,
 } from "../../services/api-services/game";
 import {
   Box,
@@ -68,6 +70,8 @@ const OnlineGame = () => {
   const [makeMove] = useMakeMoveMutation();
   const [resetGameApi] = useResetGameMutation();
   const [switchPlayerRoles] = useSwitchPlayerRolesMutation();
+  const [updatePlayerGameRoomStatus] = useUpdatePlayerGameRoomStatusMutation();
+  const [joinGameRoom] = useJoinGameRoomMutation();
 
   const [squares, setSquares] = useState(() => initialiseChessBoard());
   const [whiteFallenSoldiers, setWhiteFallenSoldiers] = useState([]);
@@ -80,6 +84,15 @@ const OnlineGame = () => {
     if (paramGameId) {
       setGameId(paramGameId);
       localStorage.setItem("currentGameId", paramGameId);
+
+      joinGameRoom({ gameId: paramGameId })
+        .unwrap()
+        .then(() => {
+          console.log("Player joined game room successfully");
+        })
+        .catch((error) => {
+          console.error("Error joining game room:", error);
+        });
     } else {
       const storedGameId = localStorage.getItem("currentGameId");
 
@@ -89,7 +102,22 @@ const OnlineGame = () => {
         navigate("/online");
       }
     }
-  }, [paramGameId, navigate]);
+  }, [paramGameId, navigate, joinGameRoom]);
+
+  useEffect(() => {
+    return () => {
+      if (gameId) {
+        updatePlayerGameRoomStatus({ gameId })
+          .unwrap()
+          .then(() => {
+            console.log("Player status updated successfully");
+          })
+          .catch((error) => {
+            console.error("Error updating player status:", error);
+          });
+      }
+    };
+  }, [gameId, updatePlayerGameRoomStatus]);
 
   useEffect(() => {
     if (gameData && gameData.players) {
@@ -150,7 +178,6 @@ const OnlineGame = () => {
 
   useEffect(() => {
     if (!socket || !gameId) return;
-
     const handleNewMove = (data) => {
       if (data.gameId === gameId) {
         console.log("handleNewMove data", data);
@@ -161,16 +188,12 @@ const OnlineGame = () => {
         refetchGameData?.();
       }
     };
-    socket.on("newMove", handleNewMove);
-
     const handleGameOverEvent = (data) => {
       if (data.gameId === gameId) {
         addNotification(data.message, "success");
         refetchGameData?.();
       }
     };
-    socket.on("gameOver", handleGameOverEvent);
-
     const handleCheckEvent = (data) => {
       if (data.gameId === gameId) {
         addNotification(
@@ -180,8 +203,6 @@ const OnlineGame = () => {
         );
       }
     };
-    socket.on("checkToKing", handleCheckEvent);
-
     const handleResetGameEvent = (data) => {
       if (data.oldGameId === gameId) {
         console.log("handleResetGameEvent data", data);
@@ -207,23 +228,40 @@ const OnlineGame = () => {
         navigate(`/game/${data.newGameId}`);
       }
     };
-    socket.on("gameReset", handleResetGameEvent);
-
     const handlePlayerRolesSwitched = (data) => {
       if (data.gameId === gameId) {
         addNotification(`Player roles have been switched.`, "info");
         refetchGameData?.();
       }
     };
-    socket.on("playerRolesSwitched", handlePlayerRolesSwitched);
-
     const handlePlayerJoinedGame = (data) => {
       if (data.gameId === gameId) {
         addNotification(data.message || `New player joined game.`, "info");
         refetchGameData?.();
       }
     };
+    const handlePlayerGameRoomStatusUpdated = (data) => {
+      if (data.gameId === gameId) {
+        if (data.playerId !== userId) {
+          addNotification(
+            `${data.username} has ${
+              data.isOnlineInGameRoom ? "joined" : "left"
+            } the game room.`,
+            "info",
+            1500
+          );
+          refetchGameData?.();
+        }
+      }
+    };
+
+    socket.on("newMove", handleNewMove);
+    socket.on("gameOver", handleGameOverEvent);
+    socket.on("checkToKing", handleCheckEvent);
+    socket.on("gameReset", handleResetGameEvent);
+    socket.on("playerRolesSwitched", handlePlayerRolesSwitched);
     socket.on("playerJoinedGame", handlePlayerJoinedGame);
+    socket.on("playerGameRoomStatusUpdated", handlePlayerGameRoomStatusUpdated);
 
     return () => {
       socket.off("newMove", handleNewMove);
@@ -232,6 +270,10 @@ const OnlineGame = () => {
       socket.off("gameReset", handleResetGameEvent);
       socket.off("playerRolesSwitched", handlePlayerRolesSwitched);
       socket.off("playerJoinedGame", handlePlayerJoinedGame);
+      socket.off(
+        "playerGameRoomStatusUpdated",
+        handlePlayerGameRoomStatusUpdated
+      );
     };
   }, [
     socket,

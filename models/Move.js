@@ -8,11 +8,11 @@ const CapturedPieceSchema = new mongoose.Schema(
       required: true,
     },
     style: {
-      type: Object, // Or define a more specific schema if needed
+      type: Object,
       required: true,
     },
     initialPositions: {
-      type: Object, // Define structure as needed
+      type: Object,
       required: false,
     },
     type: {
