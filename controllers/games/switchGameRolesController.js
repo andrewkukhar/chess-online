@@ -23,7 +23,7 @@ exports.switchPlayerRoles = async (req, res) => {
       return res.status(404).json({ message: "Game not found." });
     }
 
-    if (!game.players.some((player) => player.toString() === userId)) {
+    if (!game.players.some((p) => p.player.toString() === userId)) {
       return res.status(403).json({ message: "Unauthorized to switch roles." });
     }
 
@@ -38,7 +38,7 @@ exports.switchPlayerRoles = async (req, res) => {
     await game.save();
 
     const playerSockets = game.players
-      .map((player) => socket.getUserSocketId(player.toString()))
+      .map((p) => socket.getUserSocketId(p.player.toString()))
       .filter((socketId) => socketId);
 
     playerSockets.forEach((socketId) => {

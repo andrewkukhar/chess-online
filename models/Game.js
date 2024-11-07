@@ -1,16 +1,22 @@
 // models/Game.js
 const mongoose = require("mongoose");
 
+const PlayerSchema = new mongoose.Schema({
+  player: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+  isOnlineInGameRoom: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const GameSchema = new mongoose.Schema({
   name: {
     type: String,
   },
-  players: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-  ],
+  players: [PlayerSchema],
   moves: [
     {
       type: mongoose.Schema.Types.ObjectId,

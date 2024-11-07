@@ -16,13 +16,13 @@ exports.getAllGamesByUser = async (req, res) => {
     return res.status(400).json({ message: "Invalid user ID." });
   }
   try {
-    const query = { players: userId };
+    const query = { "players.player": userId };
     if (status && status !== "all") {
       query.status = status.toLowerCase();
     }
 
     const games = await Game.find(query)
-      .populate("players")
+      .populate("players.player")
       .populate("winner")
       .populate({
         path: "moves",
@@ -57,7 +57,7 @@ exports.getAllGames = async (req, res) => {
     }
 
     const games = await Game.find(query)
-      .populate("players")
+      .populate("players.player")
       .populate("winner")
       .populate({
         path: "moves",

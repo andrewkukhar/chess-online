@@ -1,6 +1,6 @@
 // /socket.js
 const { Server } = require("socket.io");
-
+const Game = require("./models/Game");
 let io;
 let userSocketMap = new Map();
 

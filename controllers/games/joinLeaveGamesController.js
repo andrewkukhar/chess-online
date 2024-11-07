@@ -26,7 +26,7 @@ exports.joinGame = async (req, res) => {
     }
 
     // Check if user is already a player in the game
-    if (game.players.includes(playerId)) {
+    if (game.players.some((p) => p.player.toString() === playerId)) {
       return res.status(400).json({ message: "You are already in this game." });
     }
 
@@ -36,7 +36,7 @@ exports.joinGame = async (req, res) => {
     }
 
     // Add user to the game
-    game.players.push(playerId);
+    game.players.push({ player: playerId });
 
     // Update game status if two players are present
     if (game.players.length === 2) {
@@ -46,7 +46,7 @@ exports.joinGame = async (req, res) => {
     await game.save();
 
     const playerSockets = game.players
-      .map((player) => socket.getUserSocketId(player.toString()))
+      .map((p) => socket.getUserSocketId(p.player.toString()))
       .filter((socketId) => socketId);
 
     playerSockets.forEach((socketId) => {
@@ -88,15 +88,13 @@ exports.leaveGame = async (req, res) => {
       return res.status(404).json({ message: "Game not found." });
     }
 
-    if (!game.players.includes(playerId)) {
+    if (!game.players.some((p) => p.player.toString() === playerId)) {
       return res
         .status(400)
         .json({ message: "You are not part of this game." });
     }
 
-    game.players = game.players.filter(
-      (player) => player.toString() !== playerId
-    );
+    game.players = game.players.filter((p) => p.player.toString() !== playerId);
 
     if (game.players.length < 2) {
       game.status = "waiting";
@@ -104,8 +102,8 @@ exports.leaveGame = async (req, res) => {
 
     await game.save();
 
-    game.players.forEach((player) => {
-      const socketId = socket.getUserSocketId(player.toString());
+    game.players.forEach((p) => {
+      const socketId = socket.getUserSocketId(p.player.toString());
       if (socketId) {
         io.to(socketId).emit("playerLeftGame", {
           gameId: game._id,

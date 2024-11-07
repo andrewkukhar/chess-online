@@ -28,6 +28,7 @@ import initialiseChessBoard from "../../helpers/board-initialiser";
 import { resetGame } from "../../helpers/resetGame";
 import ConfirmationDialog from "../../helpers/ConfirmationDialog";
 import InvitatioDialog from "./InvitationDialog";
+import PlayerStatusBadge from "../../helpers/PlayerStatusBadge";
 
 const OnlineGame = () => {
   const { gameId: paramGameId } = useParams();
@@ -95,7 +96,7 @@ const OnlineGame = () => {
       // console.log("Game Data:", gameData);
       // console.log("Number of Moves:", gameData.moves.length);
       const playerIndex = gameData.players.findIndex(
-        (player) => player._id === userId
+        (p) => p?.player?._id === userId
       );
       const color = playerIndex === 0 ? "white" : "black";
       setPlayerColor(color);
@@ -152,6 +153,7 @@ const OnlineGame = () => {
 
     const handleNewMove = (data) => {
       if (data.gameId === gameId) {
+        console.log("handleNewMove data", data);
         addNotification("A new move has been made.", "info", 1000);
         setPlayerTurn(data.playerTurn);
         setLastMove({ from: data.moveFrom, to: data.moveTo });
@@ -182,6 +184,7 @@ const OnlineGame = () => {
 
     const handleResetGameEvent = (data) => {
       if (data.oldGameId === gameId) {
+        console.log("handleResetGameEvent data", data);
         addNotification(
           data.message ||
             `The ongoing game has been reset. A new game has begun.`,
@@ -294,7 +297,7 @@ const OnlineGame = () => {
     }
 
     const clickedPiece = squares[i];
-
+    console.log("clickedPiece", clickedPiece);
     if (selectedSquare === null) {
       if (clickedPiece && clickedPiece.player === (isHost ? 1 : 2)) {
         setSelectedSquare(i);
@@ -317,6 +320,7 @@ const OnlineGame = () => {
 
     if (isMovePossible) {
       const capturedPiece = squares[i];
+      console.log("capturedPiece", capturedPiece);
       const capturedData = capturedPiece
         ? {
             player: capturedPiece.player,
@@ -325,7 +329,7 @@ const OnlineGame = () => {
             type: capturedPiece.type,
           }
         : null;
-      // console.log("capturedData", capturedData);
+      console.log("capturedData", capturedData);
 
       handleMove(selectedSquare, i, sourcePiece, capturedData);
       setSelectedSquare(null);
@@ -373,7 +377,7 @@ const OnlineGame = () => {
   const getPlayerNameByColor = (color) => {
     if (!gameData || !gameData.players) return "";
     const playerIndex = color === "white" ? 0 : 1;
-    return gameData.players[playerIndex]?.username || color;
+    return gameData.players[playerIndex]?.player?.username || color;
   };
 
   const handleInviteClick = () => {
@@ -382,6 +386,11 @@ const OnlineGame = () => {
 
   const handleCloseInviteDialog = () => {
     setInviteDialogOpen(false);
+  };
+
+  const isPlayerOnline = (playerId) => {
+    const playerData = gameData?.players.find((p) => p.player._id === playerId);
+    return playerData && playerData.isOnlineInGameRoom;
   };
 
   if (gameLoading || movesLoading) {
@@ -478,8 +487,25 @@ const OnlineGame = () => {
         </Box>
         <Box>
           <Typography variant="h6" mt={1}>
-            Players: {gameData?.players?.[0]?.username || "Player 1"} vs{" "}
-            {gameData?.players?.[1]?.username || "Player 2"}
+            Players:{" "}
+            <PlayerStatusBadge
+              isOnline={isPlayerOnline(gameData?.players?.[0]?.player?._id)}
+              playerInitial={
+                gameData?.players?.[0]?.player?.username
+                  ?.charAt(0)
+                  .toUpperCase() || "P"
+              }
+            />
+            {gameData?.players?.[0]?.player?.username || "Player 1"} vs{" "}
+            <PlayerStatusBadge
+              isOnline={isPlayerOnline(gameData?.players?.[1]?.player?._id)}
+              playerInitial={
+                gameData?.players?.[1]?.player?.username
+                  ?.charAt(0)
+                  .toUpperCase() || "P"
+              }
+            />
+            {gameData?.players?.[1]?.player?.username || "Player 2"}
           </Typography>
         </Box>
         <Box

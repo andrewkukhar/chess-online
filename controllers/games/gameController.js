@@ -24,7 +24,7 @@ exports.removeGame = async (req, res) => {
     }
 
     // Check if the requester is the host (first player)
-    if (game.players[0].toString() !== userId) {
+    if (game.players[0].player.toString() !== userId) {
       return res
         .status(403)
         .json({ message: "Unauthorized to remove this game." });
@@ -33,7 +33,7 @@ exports.removeGame = async (req, res) => {
     await Game.deleteOne({ _id: game._id });
 
     const playerSockets = game.players
-      .map((player) => socket.getUserSocketId(player.toString()))
+      .map((player) => socket.getUserSocketId(player.player.toString()))
       .filter((socketId) => socketId);
 
     playerSockets.forEach((socketId) => {
@@ -64,7 +64,7 @@ exports.getGame = async (req, res) => {
 
   try {
     const game = await Game.findById(gameId)
-      .populate("players")
+      .populate("players.player")
       .populate("winner")
       .populate({
         path: "moves",
@@ -75,11 +75,31 @@ exports.getGame = async (req, res) => {
       return res.status(404).json({ message: "Game not found." });
     }
 
-    if (!game.players.some((player) => player._id.toString() === userId)) {
+    const player = game.players.find((p) => p.player._id.toString() === userId);
+    if (!player) {
       return res
         .status(403)
         .json({ message: "Unauthorized to view this game." });
     }
+
+    player.isOnlineInGameRoom = true;
+    await game.save();
+
+    const otherPlayers = game.players.filter(
+      (p) => p.player._id.toString() !== userId
+    );
+    otherPlayers.forEach((otherPlayer) => {
+      const socketId = socket.getUserSocketId(
+        otherPlayer.player._id.toString()
+      );
+      if (socketId) {
+        io.to(socketId).emit("playerRoomStatusUpdated", {
+          gameId,
+          userId,
+          isOnlineInGameRoom: true,
+        });
+      }
+    });
 
     res.status(200).json(game);
   } catch (err) {

@@ -23,14 +23,14 @@ exports.getMove = async (req, res) => {
       .populate("player")
       .populate({
         path: "game",
-        populate: { path: "players" },
+        populate: { path: "players.player" },
       });
 
     if (!move) {
       return res.status(404).json({ message: "Move not found." });
     }
 
-    if (!move.game.players.some((player) => player._id.toString() === userId)) {
+    if (!move.game.players.some((p) => p.player._id.toString() === userId)) {
       return res
         .status(403)
         .json({ message: "Unauthorized to view this move." });
@@ -62,13 +62,13 @@ exports.getAllMoves = async (req, res) => {
         path: "moves",
         populate: { path: "player" },
       })
-      .populate("players");
+      .populate("players.player");
 
     if (!game) {
       return res.status(404).json({ message: "Game not found." });
     }
 
-    if (!game.players.some((player) => player._id.toString() === userId)) {
+    if (!game.players.some((p) => p.player._id.toString() === userId)) {
       return res
         .status(403)
         .json({ message: "Unauthorized to view moves of this game." });
@@ -99,7 +99,7 @@ exports.undoMove = async (req, res) => {
   try {
     const game = await Game.findById(gameId)
       .populate("moves")
-      .populate("players");
+      .populate("players.player");
     if (!game) {
       return res.status(404).json({ message: "Game not found." });
     }

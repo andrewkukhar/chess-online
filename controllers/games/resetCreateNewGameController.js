@@ -23,7 +23,7 @@ exports.resetGame = async (req, res) => {
       return res.status(404).json({ message: "Game not found." });
     }
 
-    if (!game.players.includes(userId)) {
+    if (!game.players.some((p) => p.player.toString() === userId)) {
       return res
         .status(403)
         .json({ message: "Unauthorized to reset this game." });
@@ -51,12 +51,16 @@ exports.resetGame = async (req, res) => {
     });
 
     await newGame.save();
-
+    console.log("newGame.players", newGame.players);
+    console.log("game.players", game.players);
     const playerSockets = game.players
-      .map((player) => socket.getUserSocketId(player.toString()))
+      .map((p) => socket.getUserSocketId(p.player.toString()))
       .filter((socketId) => socketId);
+    console.log("playerSockets", playerSockets);
 
     playerSockets.forEach((socketId) => {
+      console.log("before gameReset socketId", socketId);
+
       io.to(socketId).emit("gameReset", {
         oldGameId: game._id,
         newGameId: newGame._id,

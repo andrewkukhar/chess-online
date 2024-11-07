@@ -37,7 +37,7 @@ exports.makeMove = async (req, res) => {
   }
 
   try {
-    const game = await Game.findById(gameId).populate("moves players");
+    const game = await Game.findById(gameId).populate("moves players.player");
     if (!game) {
       return res.status(404).json({ message: "Game not found." });
     }
@@ -46,14 +46,14 @@ exports.makeMove = async (req, res) => {
       return res.status(400).json({ message: "Game is not ongoing." });
     }
 
-    if (!game.players.some((player) => player._id.toString() === userId)) {
+    if (!game.players.some((p) => p.player._id.toString() === userId)) {
       return res
         .status(403)
         .json({ message: "You are not a player in this game." });
     }
 
     const userColor =
-      game.players[0]._id.toString() === userId ? "white" : "black";
+      game.players[0].player._id.toString() === userId ? "white" : "black";
     const playerNumber = userColor === "white" ? 1 : 2;
 
     const currentTurnPlayer = game.moves.length % 2 === 0 ? "white" : "black";
@@ -111,7 +111,7 @@ exports.makeMove = async (req, res) => {
     const updatedPlayerTurn = game.moves.length % 2 === 0 ? "white" : "black";
 
     const playerSockets = game.players
-      .map((player) => socket.getUserSocketId(player._id.toString()))
+      .map((p) => socket.getUserSocketId(p.player._id.toString()))
       .filter((socketId) => socketId);
 
     playerSockets.forEach((socketId) => {

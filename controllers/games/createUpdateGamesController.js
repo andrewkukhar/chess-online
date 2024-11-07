@@ -21,7 +21,7 @@ exports.createGame = async (req, res) => {
   try {
     const newGame = new Game({
       name: name,
-      players: [userId],
+      players: [{ player: userId, isOnlineInGameRoom: false }],
       status: "waiting",
     });
 
@@ -72,7 +72,7 @@ exports.updateGame = async (req, res) => {
     }
 
     // Check if the requester is a player in the game
-    if (!game.players.includes(mongoose.Types.ObjectId(userId))) {
+    if (!game.players.some((p) => p.player.toString() === userId)) {
       return res
         .status(403)
         .json({ message: "Unauthorized to update this game." });

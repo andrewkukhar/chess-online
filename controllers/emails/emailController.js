@@ -36,7 +36,7 @@ exports.sendGameLink = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found." });
 
     const game = await Game.findById(gameId)
-      .populate("players")
+      .populate("players.player")
       .populate("winner")
       .populate({
         path: "moves",
@@ -82,11 +82,15 @@ exports.sendGameLink = async (req, res) => {
       token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "3h" });
     }
 
-    if (!game.players.includes(invitedUser._id)) {
+    if (
+      !game.players.some(
+        (p) => p.player.toString() === invitedUser._id.toString()
+      )
+    ) {
       if (game.players.length >= 2) {
         return res.status(400).json({ message: "Game is already full." });
       }
-      game.players.push(invitedUser._id);
+      game.players.push({ player: invitedUser._id });
 
       if (game.players.length === 2) {
         game.status = "ongoing";
@@ -95,7 +99,7 @@ exports.sendGameLink = async (req, res) => {
       await game.save();
 
       const playerSockets = game.players
-        .map((player) => socket.getUserSocketId(player.toString()))
+        .map((p) => socket.getUserSocketId(p.player.toString()))
         .filter((socketId) => socketId);
 
       playerSockets.forEach((socketId) => {
