@@ -133,9 +133,9 @@ const OnlineGame = () => {
       const color = playerIndex === 0 ? "white" : "black";
       setPlayerColor(color);
       setIsHost(playerIndex === 0);
-      const turn = gameData.moves.length % 2 === 0 ? "white" : "black";
-      // console.log("Next Player Turn:", turn);
-      setPlayerTurn(turn);
+      // const turn = gameData.moves.length % 2 === 0 ? "white" : "black";
+      // // console.log("Next Player Turn:", turn);
+      // setPlayerTurn(turn);
     }
   }, [gameData, userId]);
 
@@ -342,9 +342,9 @@ const OnlineGame = () => {
           .unwrap()
           .then((aiResult) => {
             refetchMoves?.();
-            setPlayerTurn(aiResult?.data?.playerTurn);
+            setPlayerTurn(aiResult?.playerTurn);
 
-            if (aiResult?.data?.checkmate) {
+            if (aiResult?.checkmate) {
               addNotification("Checkmate! The AI has won the game.", "info");
               setWinnerName("AI");
             }
