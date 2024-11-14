@@ -4,6 +4,7 @@ import authApi from "../api-services/auth";
 import userApi from "../api-services/user";
 import checkApi from "../api-services/check";
 import gameApi from "../api-services/game";
+import gameAIApi from "../api-services/game-ai";
 import moveApi from "../api-services/move";
 import emailApi from "../api-services/email";
 
@@ -15,6 +16,7 @@ export const store = configureStore({
     [gameApi.reducerPath]: gameApi.reducer,
     [moveApi.reducerPath]: moveApi.reducer,
     [emailApi.reducerPath]: emailApi.reducer,
+    [gameAIApi.reducerPath]: gameAIApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware()
@@ -23,5 +25,6 @@ export const store = configureStore({
       .concat(userApi.middleware)
       .concat(gameApi.middleware)
       .concat(moveApi.middleware)
-      .concat(emailApi.middleware),
+      .concat(emailApi.middleware)
+      .concat(gameAIApi.middleware),
 });

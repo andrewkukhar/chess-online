@@ -11,6 +11,7 @@ const {
   hasAnyLegalMoves,
   isKingInCheck,
 } = require("./moveHelpers");
+const { generateAIMove } = require("../ai/move/generateAIMoveController");
 
 /**
  * Make a move in a game.
@@ -111,6 +112,7 @@ exports.makeMove = async (req, res) => {
     const updatedPlayerTurn = game.moves.length % 2 === 0 ? "white" : "black";
 
     const playerSockets = game.players
+      .filter((player) => !player.isAI)
       .map((p) => socket.getUserSocketId(p.player._id.toString()))
       .filter((socketId) => socketId);
 
@@ -160,6 +162,7 @@ exports.makeMove = async (req, res) => {
       move: newMove,
       check,
       checkmate,
+      playerTurn: updatedPlayerTurn,
     });
   } catch (err) {
     console.error("Error in makeMove:", err.message);

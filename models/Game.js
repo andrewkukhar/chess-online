@@ -6,9 +6,20 @@ const PlayerSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
+  isAI: {
+    type: Boolean,
+    default: false,
+  },
   isOnlineInGameRoom: {
     type: Boolean,
     default: false,
+  },
+  difficultyLevel: {
+    type: String,
+    enum: ["easy", "medium", "hard"],
+    required: function () {
+      return this.isAI;
+    },
   },
 });
 

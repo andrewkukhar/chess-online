@@ -3,43 +3,74 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NotificationContext } from "../../contexts/NotificationContext";
 import { useCreateGameMutation } from "../../services/api-services/game";
+import { useCreateGameAgainstAIMutation } from "../../services/api-services/game-ai";
 import {
   Button,
   Box,
   Typography,
   CircularProgress,
   TextField,
+  FormControlLabel,
+  Checkbox,
+  Select,
+  MenuItem,
 } from "@mui/material";
 
 const CreateGame = () => {
   const navigate = useNavigate();
   const { addNotification } = useContext(NotificationContext);
   const [gameName, setGameName] = useState("");
+  const [againstAI, setAgainstAI] = useState(false);
+  const [difficultyLevel, setDifficultyLevel] = useState("easy");
+
   const [createGame, { isLoading }] = useCreateGameMutation();
+  const [createGameAgainstAI, { isLoading: isCreatingAIGame }] =
+    useCreateGameAgainstAIMutation();
 
   const handleCreateNewGame = async () => {
     if (!gameName.trim()) {
       addNotification(`Please enter a valid game name!`, "warning");
       return;
     }
-    const result = await createGame(gameName);
-
-    if (result?.data && result?.data?.game) {
-      addNotification(
-        result?.data?.message || `Game created successfully!`,
-        "success"
-      );
-
-      localStorage.setItem("currentGameId", result?.data?.game?._id);
-      setTimeout(() => {
-        navigate(`/game/${result?.data?.game?._id}`);
-      }, 2000);
+    if (againstAI) {
+      const result = await createGameAgainstAI({
+        name: gameName,
+        difficultyLevel,
+      });
+      if (result?.data && result?.data?.game) {
+        addNotification(
+          result?.data?.message || `Game against AI created successfully!`,
+          "success"
+        );
+        localStorage.setItem("currentGameId", result?.data?.game?._id);
+        setTimeout(() => {
+          navigate(`/game/${result?.data?.game?._id}`);
+        }, 2000);
+      } else {
+        console.log("Error result:", result);
+        addNotification(
+          result?.error?.data?.message || `Failed to create game against AI!`,
+          "error"
+        );
+      }
     } else {
-      console.log("Error result:", result);
-      addNotification(
-        result?.error?.data?.message || `Failed to create game!`,
-        "error"
-      );
+      const result = await createGame(gameName);
+      if (result?.data && result?.data?.game) {
+        addNotification(
+          result?.data?.message || `Game created successfully!`,
+          "success"
+        );
+        localStorage.setItem("currentGameId", result?.data?.game?._id);
+        setTimeout(() => {
+          navigate(`/game/${result?.data?.game?._id}`);
+        }, 2000);
+      } else {
+        console.log("Error result:", result);
+        addNotification(
+          result?.error?.data?.message || `Failed to create game!`,
+          "error"
+        );
+      }
     }
   };
 
@@ -92,14 +123,57 @@ const CreateGame = () => {
           },
         }}
       />
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={againstAI}
+            onChange={(e) => setAgainstAI(e.target.checked)}
+          />
+        }
+        label="Play against AI"
+        sx={{ marginBottom: "1rem" }}
+      />
+      {againstAI && (
+        <Select
+          value={difficultyLevel}
+          onChange={(e) => setDifficultyLevel(e.target.value)}
+          fullWidth
+          variant="outlined"
+          sx={{
+            marginBottom: "1rem",
+            color: "#ffffff",
+            "& .MuiInputBase-root": {
+              color: "#ffffff",
+            },
+            "& .MuiInputLabel-root": {
+              color: "rgba(255, 255, 255, 0.7)",
+            },
+            "& .MuiOutlinedInput-root": {
+              "& fieldset": {
+                borderColor: "rgba(255, 255, 255, 0.5)",
+              },
+              "&:hover fieldset": {
+                borderColor: "#ffffff",
+              },
+              "&.Mui-focused fieldset": {
+                borderColor: "#ffffff",
+              },
+            },
+          }}
+        >
+          <MenuItem value="easy">Easy</MenuItem>
+          <MenuItem value="medium">Medium</MenuItem>
+          <MenuItem value="hard">Hard</MenuItem>
+        </Select>
+      )}
       <Button
         variant="contained"
         color="primary"
         onClick={handleCreateNewGame}
-        disabled={isLoading}
+        disabled={isLoading || isCreatingAIGame}
         sx={{ marginTop: "2rem", width: "100%", padding: "0.75rem" }}
       >
-        {isLoading ? (
+        {isLoading || isCreatingAIGame ? (
           <CircularProgress size={24} color="inherit" />
         ) : (
           "Create Game"

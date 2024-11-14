@@ -1,4 +1,4 @@
-// controllers/gameRoomController.js
+// controllers/games/gameRoomController.js
 const mongoose = require("mongoose");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
@@ -24,6 +24,12 @@ exports.joinGameRoom = async (req, res) => {
     }
     const player = game.players.find((p) => p.player._id.toString() === userId);
     if (!player) {
+      if (game.players.some((p) => p.isAI)) {
+        return res
+          .status(200)
+          .json({ message: "AI player found, no status update required." });
+      }
+
       return res
         .status(403)
         .json({ message: "Unauthorized to join this game." });
@@ -33,24 +39,25 @@ exports.joinGameRoom = async (req, res) => {
     if (!player.isOnlineInGameRoom) {
       player.isOnlineInGameRoom = true;
       await game.save();
-
-      const otherPlayers = game.players.filter(
-        (p) => p.player._id.toString() !== userId
-      );
-
-      otherPlayers.forEach((otherPlayer) => {
-        const socketId = socket.getUserSocketId(
-          otherPlayer.player._id.toString()
+      if (!game.players.some((p) => p.isAI)) {
+        const otherPlayers = game.players.filter(
+          (p) => p.player._id.toString() !== userId
         );
-        if (socketId) {
-          io.to(socketId).emit("playerGameRoomStatusUpdated", {
-            gameId,
-            playerId: userId,
-            username: playerUsername,
-            isOnlineInGameRoom: true,
-          });
-        }
-      });
+
+        otherPlayers.forEach((otherPlayer) => {
+          const socketId = socket.getUserSocketId(
+            otherPlayer.player._id.toString()
+          );
+          if (socketId) {
+            io.to(socketId).emit("playerGameRoomStatusUpdated", {
+              gameId,
+              playerId: userId,
+              username: playerUsername,
+              isOnlineInGameRoom: true,
+            });
+          }
+        });
+      }
     }
 
     res.status(200).json({ message: "Player joined game room successfully." });
@@ -81,6 +88,12 @@ exports.updatePlayerGameRoomStatus = async (req, res) => {
 
     const player = game.players.find((p) => p.player._id.toString() === userId);
     if (!player) {
+      if (game.players.some((p) => p.isAI)) {
+        return res
+          .status(200)
+          .json({ message: "AI player found, no status update required." });
+      }
+
       return res
         .status(403)
         .json({ message: "Unauthorized to update this game." });
@@ -91,17 +104,19 @@ exports.updatePlayerGameRoomStatus = async (req, res) => {
 
     const playerUsername = player.player.username;
 
-    game.players.forEach((p) => {
-      const socketId = socket.getUserSocketId(p.player._id.toString());
-      if (socketId) {
-        io.to(socketId).emit("playerGameRoomStatusUpdated", {
-          gameId: game._id,
-          playerId: userId,
-          username: playerUsername,
-          isOnlineInGameRoom: false,
-        });
-      }
-    });
+    if (!game.players.some((p) => p.isAI)) {
+      game.players.forEach((p) => {
+        const socketId = socket.getUserSocketId(p.player._id.toString());
+        if (socketId) {
+          io.to(socketId).emit("playerGameRoomStatusUpdated", {
+            gameId: game._id,
+            playerId: userId,
+            username: playerUsername,
+            isOnlineInGameRoom: false,
+          });
+        }
+      });
+    }
 
     res.status(200).json({ message: "Player status updated successfully." });
   } catch (err) {

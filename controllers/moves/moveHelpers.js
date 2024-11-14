@@ -43,14 +43,14 @@ function initialiseChessBoard() {
  */
 function reconstructBoard(moves) {
   const board = Array(64).fill(null);
-
   const initialBoard = initialiseChessBoard();
+
   for (let i = 0; i < 64; i++) {
     board[i] = initialBoard[i] ? { ...initialBoard[i] } : null;
   }
 
   moves.forEach((move, index) => {
-    const { from, to, piece, captured } = move;
+    const { from, to, piece } = move;
 
     if (from === undefined || to === undefined || !piece) {
       console.error(`Move at index ${index} is missing required fields:`, move);
@@ -279,27 +279,12 @@ function validateMove(board, move, player) {
   tempBoard[from] = null;
 
   // Check if the player's King is in check after the move
-  if (piece === "King" || isKingInCheck(tempBoard, player)) {
-    if (isKingInCheck(tempBoard, player)) {
-      return false;
-    }
+  if (isKingInCheck(tempBoard, player)) {
+    return false;
   }
 
   return true;
 }
-
-/**
- * Helper function to convert board index (0-63) to algebraic notation (a1-h8)
- * @param {number} index - Board index (0-63)
- * @returns {string} - Algebraic notation (e.g., 'e2')
- */
-function indexToAlgebraic(index) {
-  const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
-  const rank = Math.floor(index / 8) + 1;
-  const file = files[index % 8];
-  return `${file}${rank}`;
-}
-
 /**
  * Checks if the player has any legal moves left.
  * @param {Array} board - Current board state.
@@ -325,6 +310,107 @@ function hasAnyLegalMoves(board, player) {
   return false;
 }
 
+/**
+ * Helper function to convert board index (0-63) to algebraic notation (a8-h1)
+ * @param {number} index - Board index (0-63)
+ * @returns {string} - Algebraic notation (e.g., 'e2')
+ */
+function indexToAlgebraic(index) {
+  const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const rank = 8 - Math.floor(index / 8); // Corrected rank calculation
+  const file = files[index % 8];
+  return `${file}${rank}`;
+}
+
+/**
+ * Converts algebraic notation (e.g., 'e5') to board index (0-63).
+ * @param {string} algebraic - Algebraic notation of the square (e.g., 'e5').
+ * @returns {number} - Corresponding board index (0-63), or -1 if invalid.
+ */
+function convertAlgebraicToIndex(algebraic) {
+  const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
+  const file = algebraic[0].toLowerCase();
+  const rank = parseInt(algebraic[1], 10);
+
+  if (!files.includes(file) || isNaN(rank) || rank < 1 || rank > 8) {
+    console.error(`Invalid algebraic notation: ${algebraic}`);
+    return -1;
+  }
+
+  const fileIndex = files.indexOf(file);
+  const rankIndex = 8 - rank; // Corrected rank index calculation
+
+  return rankIndex * 8 + fileIndex;
+}
+
+function convertBoardToFEN(board, activeColor, fullMoveNumber) {
+  let fen = "";
+  for (let rank = 7; rank >= 0; rank--) {
+    let emptyCount = 0;
+    for (let file = 0; file < 8; file++) {
+      const index = rank * 8 + file;
+      const piece = board[index];
+      if (piece === null) {
+        emptyCount++;
+      } else {
+        if (emptyCount > 0) {
+          fen += emptyCount;
+          emptyCount = 0;
+        }
+        const pieceChar = getPieceChar(piece);
+        fen += pieceChar;
+      }
+    }
+    if (emptyCount > 0) {
+      fen += emptyCount;
+    }
+    if (rank > 0) {
+      fen += "/";
+    }
+  }
+
+  fen += ` ${activeColor} - - 0 ${fullMoveNumber}`;
+
+  return fen;
+}
+
+function getPieceChar(piece) {
+  const charMap = {
+    Pawn: "p",
+    Rook: "r",
+    Knight: "n",
+    Bishop: "b",
+    Queen: "q",
+    King: "k",
+  };
+
+  const char = charMap[piece.type];
+  return piece.player === 1 ? char.toUpperCase() : char;
+}
+
+function getAllLegalMoves(board, player) {
+  const moves = [];
+  for (let src = 0; src < 64; src++) {
+    const piece = board[src];
+    if (piece && piece.player === player) {
+      for (let dest = 0; dest < 64; dest++) {
+        const proposedMove = {
+          from: src,
+          to: dest,
+          piece: piece.type,
+        };
+        if (validateMove(board, proposedMove, player)) {
+          const moveNotation = `${indexToAlgebraic(src)}${indexToAlgebraic(
+            dest
+          )} (${piece.type})`;
+          moves.push(moveNotation);
+        }
+      }
+    }
+  }
+  return moves;
+}
+
 module.exports = {
   PIECE_TYPES,
   reconstructBoard,
@@ -339,4 +425,7 @@ module.exports = {
   hasAnyLegalMoves,
   initialiseChessBoard,
   isKingInCheck,
+  convertBoardToFEN,
+  convertAlgebraicToIndex,
+  getAllLegalMoves,
 };

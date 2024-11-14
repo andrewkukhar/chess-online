@@ -1,4 +1,4 @@
-// controllers/gameController.js
+// controllers/games/getAllGamesController.js
 const mongoose = require("mongoose");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
@@ -69,7 +69,7 @@ exports.getAllGames = async (req, res) => {
 
     res.status(200).json(games);
   } catch (err) {
-    console.error("Error in getAllGamesByUser:", err.message);
+    console.error("Error in getAllGames:", err.message);
     res.status(500).json({ message: "Server error while retrieving move." });
   }
 };

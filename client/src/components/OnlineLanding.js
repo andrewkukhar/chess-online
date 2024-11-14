@@ -124,7 +124,7 @@ const OnlineLanding = () => {
             px: 2,
           }}
         >
-          <Tooltip title="Create a new game session" placement="top">
+          <Tooltip title="Create a new game session" placement="bottom">
             <Button
               variant="contained"
               color="primary"
@@ -135,7 +135,7 @@ const OnlineLanding = () => {
               Create Game
             </Button>
           </Tooltip>
-          <Tooltip title="Join an existing game session" placement="top">
+          <Tooltip title="Join an existing game session" >
             <Button
               variant="contained"
               color="secondary"

@@ -1,9 +1,17 @@
-// controllers/gameController.js
+// controllers/games/createUpdateGamesController.js
 const mongoose = require("mongoose");
 const Move = require("../../models/Move");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
 const io = socket.getIO();
+
+const createAIPlayer = (difficultyLevel) => {
+  return {
+    player: null, // Placeholder, AI player does not have a user ID.
+    isAI: true,
+    difficultyLevel,
+  };
+};
 
 /**
  * Create a new game.

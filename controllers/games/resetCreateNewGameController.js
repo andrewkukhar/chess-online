@@ -1,4 +1,4 @@
-// controllers/gameController.js
+// controllers/games/resetCreateNewGameController.js
 const mongoose = require("mongoose");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
@@ -54,6 +54,7 @@ exports.resetGame = async (req, res) => {
     console.log("newGame.players", newGame.players);
     console.log("game.players", game.players);
     const playerSockets = game.players
+      .filter((p) => p.player)
       .map((p) => socket.getUserSocketId(p.player.toString()))
       .filter((socketId) => socketId);
     console.log("playerSockets", playerSockets);

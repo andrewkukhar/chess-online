@@ -13,29 +13,46 @@
     ├── App.scss
     ├── chess-logo.png
     ├── components
-    │   ├── authentifications
+    │   ├── Navbar.js
+    │   ├── OnlineLanding.js
+    │   ├── ak-admin
+    │   │   ├── AdminDashboard.js
+    │   │   ├── forms
+    │   │   │   └── EditUserDialog.js
+    │   │   └── tabs
+    │   │       ├── GamesTab.js
+    │   │       ├── MovesTab.js
+    │   │       └── UsersTab.js
+    │   ├── assets
+    │   │   └── scss
+    │   │       ├── admin.scss
+    │   │       ├── main.scss
+    │   │       ├── notification-snackbar.scss
+    │   │       └── variables.scss
+    │   ├── authentification
     │   │   ├── Login.js
     │   │   └── Register.js
-    │   ├── Game
-    │   │   ├── CreateGame.js
-    │   │   ├── JoinGame.js
-    │   │   ├── LocalGame.js
-    │   │   └── OnlineGame.js
     │   ├── game-elements
     │   │   ├── BoardComponent.js
     │   │   ├── FallenSoldierBlock.js
     │   │   └── SquareElement.js
-    │   ├── Navbar.js
-    │   └── OnlineLanding.js
+    │   ├── games
+    │   │   ├── CreateGame.js
+    │   │   ├── InvitationDialog.js
+    │   │   ├── JoinGame.js
+    │   │   ├── LocalGame.js
+    │   │   └── OnlineGame.js
+    │   └── users
+    │       └── UserSettingsDrawer.js
     ├── contexts
     │   ├── AuthContext.js
     │   ├── NotificationContext.js
     │   └── SocketContext.js
     ├── helpers
     │   ├── ConfirmationDialog.js
+    │   ├── PlayerStatusBadge.js
     │   ├── board-initialiser.js
     │   ├── deserializeSquares.js
-    │   ├── gameStatuses.js
     │   ├── index.js
     │   ├── resetGame.js
     │   └── utils.js
@@ -52,9 +69,13 @@
     ├── services
     │   ├── api-services
     │   │   ├── auth.js
+    │   │   ├── check.js
+    │   │   ├── email.js
     │   │   ├── game.js
-    │   │   └── move.js
+    │   │   ├── move.js
+    │   │   └── user.js
     │   ├── hooks
+    │   │   ├── LoginViaToken.js
     │   │   └── useSocket.js
     │   └── redux
     │       └── store.js
@@ -62,4 +83,4 @@
         ├── ProtectedRoute.js
         └── tokenUtils.js
 
-15 directories, 48 files
+21 directories, 63 files

@@ -16,32 +16,44 @@
 │       ├── App.scss
 │       ├── chess-logo.png
 │       ├── components
-│       │   ├── authentifications
+│       │   ├── Navbar.js
+│       │   ├── OnlineLanding.js
+│       │   ├── ak-admin
+│       │   │   ├── AdminDashboard.js
+│       │   │   ├── forms
+│       │   │   │   └── EditUserDialog.js
+│       │   │   └── tabs
+│       │   │       ├── GamesTab.js
+│       │   │       ├── MovesTab.js
+│       │   │       └── UsersTab.js
+│       │   ├── assets
+│       │   │   └── scss
+│       │   │       ├── admin.scss
+│       │   │       ├── main.scss
+│       │   │       ├── notification-snackbar.scss
+│       │   │       └── variables.scss
+│       │   ├── authentification
 │       │   │   ├── Login.js
 │       │   │   └── Register.js
-│       │   ├── Game
+│       │   ├── game-elements
+│       │   │   ├── BoardComponent.js
+│       │   │   ├── FallenSoldierBlock.js
+│       │   │   └── SquareElement.js
+│       │   ├── games
 │       │   │   ├── CreateGame.js
 │       │   │   ├── InvitationDialog.js
 │       │   │   ├── JoinGame.js
 │       │   │   ├── LocalGame.js
 │       │   │   └── OnlineGame.js
-│       │   ├── game-elements
-│       │   │   ├── BoardComponent.js
-│       │   │   ├── FallenSoldierBlock.js
-│       │   │   └── SquareElement.js
-│       │   ├── Navbar.js
-│       │   ├── OnlineLanding.js
-│       │   └── assets
-│       │       └── scss
-│       │           ├── main.scss
-│       │           ├── notification-snackbar.scss
-│       │           └── variables.scss
+│       │   └── users
+│       │       └── UserSettingsDrawer.js
 │       ├── contexts
 │       │   ├── AuthContext.js
 │       │   ├── NotificationContext.js
 │       │   └── SocketContext.js
 │       ├── helpers
 │       │   ├── ConfirmationDialog.js
+│       │   ├── PlayerStatusBadge.js
 │       │   ├── board-initialiser.js
 │       │   ├── deserializeSquares.js
 │       │   ├── index.js
@@ -60,10 +72,14 @@
 │       ├── services
 │       │   ├── api-services
 │       │   │   ├── auth.js
+│       │   │   ├── check.js
 │       │   │   ├── email.js
+│       │   │   ├── game-ai.js
 │       │   │   ├── game.js
-│       │   │   └── move.js
+│       │   │   ├── move.js
+│       │   │   └── user.js
 │       │   ├── hooks
+│       │   │   ├── LoginViaToken.js
 │       │   │   └── useSocket.js
 │       │   └── redux
 │       │       └── store.js
@@ -72,14 +88,24 @@
 │           └── tokenUtils.js
 ├── controllers
 │   ├── admin
+│   │   ├── roleValidationController.js
 │   │   └── userController.js
+│   ├── ai
+│   │   ├── chat
+│   │   │   ├── chatbotController.js
+│   │   │   └── chatbotHelperData.js
+│   │   └── move
+│   │       ├── generateAIMoveController.js
+│   │       └── makeAIMoveController.js
 │   ├── auth
 │   │   └── authController.js
 │   ├── emails
 │   │   └── emailController.js
 │   ├── games
+│   │   ├── createGameAgainstAIController.js
 │   │   ├── createUpdateGamesController.js
 │   │   ├── gameController.js
+│   │   ├── gameRoomController.js
 │   │   ├── getAllGamesController.js
 │   │   ├── joinLeaveGamesController.js
 │   │   ├── resetCreateNewGameController.js
@@ -100,9 +126,12 @@
 ├── package.json
 ├── routes
 │   ├── auth.js
+│   ├── check.js
 │   ├── email.js
+│   ├── game-ai.js
 │   ├── game.js
-│   └── move.js
+│   ├── move.js
+│   └── user.js
 └── socket.js
 
-27 directories, 79 files
+34 directories, 101 files

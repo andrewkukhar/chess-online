@@ -6,7 +6,7 @@ const FallenSoldierBlock = ({ whiteFallenSoldiers, blackFallenSoldiers }) => {
   const renderFallenSoldier = (piece, index) => (
     <Avatar
       key={index}
-      src={piece.style.backgroundImage.replace("url('", "").replace("')", "")}
+      src={piece?.style?.backgroundImage?.replace("url('", "")?.replace("')", "")}
       alt="Fallen Soldier"
       sx={{
         width: 30,

@@ -1,4 +1,4 @@
-// controllers/gameController.js
+// controllers/games/gameController.js
 const mongoose = require("mongoose");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
@@ -37,6 +37,7 @@ exports.removeGame = async (req, res) => {
     await Game.deleteOne({ _id: game._id });
 
     const playerSockets = game.players
+      .filter((player) => !player.isAI)
       .map((player) => socket.getUserSocketId(player.player.toString()))
       .filter((socketId) => socketId);
 

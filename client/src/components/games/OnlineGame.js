@@ -12,6 +12,7 @@ import {
   useUpdatePlayerGameRoomStatusMutation,
   useJoinGameRoomMutation,
 } from "../../services/api-services/game";
+import { useMakeAIMoveMutation } from "../../services/api-services/game-ai";
 import {
   Box,
   Typography,
@@ -60,6 +61,7 @@ const OnlineGame = () => {
     skip: !gameId,
   });
   // console.log("gameData", gameData);
+
   const {
     data: movesData,
     refetch: refetchMoves,
@@ -68,6 +70,7 @@ const OnlineGame = () => {
     skip: !gameId,
   });
   const [makeMove] = useMakeMoveMutation();
+  const [makeAIMove] = useMakeAIMoveMutation();
   const [resetGameApi] = useResetGameMutation();
   const [switchPlayerRoles] = useSwitchPlayerRolesMutation();
   const [updatePlayerGameRoomStatus] = useUpdatePlayerGameRoomStatusMutation();
@@ -79,6 +82,7 @@ const OnlineGame = () => {
   const [playerTurn, setPlayerTurn] = useState("white");
   const [lastMove, setLastMove] = useState({ from: null, to: null });
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [isWaitingForAI, setIsWaitingForAI] = useState(false);
 
   useEffect(() => {
     if (paramGameId) {
@@ -175,6 +179,15 @@ const OnlineGame = () => {
       }
     }
   }, [movesData, gameData]);
+
+  // useEffect(() => {
+  //   if (playerTurn === "black" && gameData?.players?.some((p) => p?.isAI)) {
+  //     setTimeout(() => {
+  //       makeAIMove({ gameId });
+  //     }, 1000);
+  //     refetchMoves?.();
+  //   }
+  // }, [playerTurn, gameData?.players, gameId, makeAIMove, refetchMoves]);
 
   useEffect(() => {
     if (!socket || !gameId) return;
@@ -303,7 +316,7 @@ const OnlineGame = () => {
   };
 
   const handleMove = async (from, to, piece, captured) => {
-    if (!playerColor) {
+    if (!playerColor || isWaitingForAI) {
       addNotification(`Player color not determined.`, "error");
       return;
     }
@@ -314,6 +327,32 @@ const OnlineGame = () => {
 
     if (result?.data && result?.data?.move) {
       setLastMove({ from, to });
+
+      if (result.data.checkmate) {
+        // Game is over; do not call makeAIMove
+        addNotification("Checkmate! You have won the game.", "success");
+        setWinnerName(getPlayerNameByColor(playerColor));
+      } else if (
+        playerTurn === "white" &&
+        gameData?.players?.some((p) => p?.isAI)
+      ) {
+        setIsWaitingForAI(true);
+
+        makeAIMove({ gameId })
+          .unwrap()
+          .then((aiResult) => {
+            refetchMoves?.();
+            setPlayerTurn(aiResult?.data?.playerTurn);
+
+            if (aiResult?.data?.checkmate) {
+              addNotification("Checkmate! The AI has won the game.", "info");
+              setWinnerName("AI");
+            }
+          })
+          .finally(() => {
+            setIsWaitingForAI(false);
+          });
+      }
     } else {
       console.log("Error result:", result);
       addNotification(
@@ -324,12 +363,17 @@ const OnlineGame = () => {
   };
 
   const handleSquareClick = (i) => {
-    if (gameData?.winner) {
+    if (gameData?.status === "checkmate" || gameData?.winner) {
       addNotification(
         `The game is over. ${gameData?.winner?.username} won.`,
         "info",
         4500
       );
+      return;
+    }
+
+    if (gameData.players.some((p) => p.isAI && playerTurn === "black")) {
+      addNotification(`It's the AI's turn. Please wait...`, "info", 1500);
       return;
     }
 
@@ -431,6 +475,9 @@ const OnlineGame = () => {
   };
 
   const isPlayerOnline = (playerId) => {
+    if (!playerId) {
+      return false;
+    }
     const playerData = gameData?.players.find((p) => p.player._id === playerId);
     return playerData && playerData.isOnlineInGameRoom;
   };
@@ -468,36 +515,41 @@ const OnlineGame = () => {
           <Typography variant="h7" mr={2}>
             Online Game Room - {gameData?.name || gameId}
           </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={() => {
-              navigator.clipboard.writeText(`${gameId}`);
-              addNotification(`Game link copied to clipboard.`, "success");
-            }}
-            disabled={!gameId}
-          >
-            Copy Game Link
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={handleInviteClick}
-            disabled={!gameId}
-          >
-            Invite by Email
-          </Button>
-          {shouldShowSwitchOption && (
-            <Button
-              variant="outlined"
-              color="info"
-              onClick={() =>
-                setConfirmDialog({ open: true, action: "switchRoles" })
-              }
-            >
-              Switch Roles
-            </Button>
+          {!gameData?.players?.some((p) => p?.isAI) && (
+            <>
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${gameId}`);
+                  addNotification(`Game link copied to clipboard.`, "success");
+                }}
+                disabled={!gameId}
+              >
+                Copy Game Link
+              </Button>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleInviteClick}
+                disabled={!gameId || gameData?.players?.some((p) => p?.isAI)}
+              >
+                Invite by Email
+              </Button>
+            </>
           )}
+          {!gameData?.players?.some((p) => p?.isAI) &&
+            shouldShowSwitchOption && (
+              <Button
+                variant="outlined"
+                color="info"
+                onClick={() =>
+                  setConfirmDialog({ open: true, action: "switchRoles" })
+                }
+              >
+                Switch Roles
+              </Button>
+            )}
           <Box
             sx={{
               margin: "0.5rem",
@@ -539,15 +591,21 @@ const OnlineGame = () => {
               }
             />
             {gameData?.players?.[0]?.player?.username || "Player 1"} vs{" "}
-            <PlayerStatusBadge
-              isOnline={isPlayerOnline(gameData?.players?.[1]?.player?._id)}
-              playerInitial={
-                gameData?.players?.[1]?.player?.username
-                  ?.charAt(0)
-                  .toUpperCase() || "P"
-              }
-            />
-            {gameData?.players?.[1]?.player?.username || "Player 2"}
+            {gameData?.players?.some((p) => p?.isAI) ? (
+              "AI Bot"
+            ) : (
+              <>
+                <PlayerStatusBadge
+                  isOnline={isPlayerOnline(gameData?.players?.[1]?.player?._id)}
+                  playerInitial={
+                    gameData?.players?.[1]?.player?.username
+                      ?.charAt(0)
+                      .toUpperCase() || "P"
+                  }
+                />
+                {gameData?.players?.[1]?.player?.username || "Player 2"}
+              </>
+            )}
           </Typography>
         </Box>
         <Box
@@ -599,7 +657,7 @@ const OnlineGame = () => {
       <div className="board">
         <BoardComponent
           squares={squares}
-          onClick={handleSquareClick}
+          onClick={!isWaitingForAI ? handleSquareClick : null}
           selectedSquare={selectedSquare}
           lastMove={lastMove}
         />

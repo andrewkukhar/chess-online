@@ -1,4 +1,4 @@
-// controllers/gameController.js
+// controllers/games/joinLeaveGamesController.js
 const mongoose = require("mongoose");
 const Game = require("../../models/Game");
 const socket = require("../../socket");
