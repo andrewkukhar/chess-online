@@ -133,9 +133,6 @@ const OnlineGame = () => {
       const color = playerIndex === 0 ? "white" : "black";
       setPlayerColor(color);
       setIsHost(playerIndex === 0);
-      // const turn = gameData.moves.length % 2 === 0 ? "white" : "black";
-      // // console.log("Next Player Turn:", turn);
-      // setPlayerTurn(turn);
     }
   }, [gameData, userId]);
 
@@ -162,7 +159,7 @@ const OnlineGame = () => {
             type: type.charAt(0).toUpperCase() + type.slice(1),
           };
 
-          if (initialBoard[to].player === 1) {
+          if (captured.player === 1) {
             fallenBlack.push(fallenPiece);
           } else {
             fallenWhite.push(fallenPiece);
@@ -179,15 +176,6 @@ const OnlineGame = () => {
       }
     }
   }, [movesData, gameData]);
-
-  // useEffect(() => {
-  //   if (playerTurn === "black" && gameData?.players?.some((p) => p?.isAI)) {
-  //     setTimeout(() => {
-  //       makeAIMove({ gameId });
-  //     }, 1000);
-  //     refetchMoves?.();
-  //   }
-  // }, [playerTurn, gameData?.players, gameId, makeAIMove, refetchMoves]);
 
   useEffect(() => {
     if (!socket || !gameId) return;

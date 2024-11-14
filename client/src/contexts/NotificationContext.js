@@ -1,17 +1,17 @@
 // src/contexts/NotificationContext.js
-import React, { createContext, useState, useRef, useEffect } from "react";
+import React, { createContext, useState } from "react";
 import { Snackbar, Alert, useMediaQuery } from "@mui/material";
 
 export const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
-  const timeoutRefs = useRef([]);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
   const addNotification = (message, severity = "info", duration = 2500) => {
     const id = new Date().getTime();
-    const autoHideDuration = duration;
+    const autoHideDuration =
+      typeof duration === "number" && duration > 0 ? duration : 2500;
 
     setNotifications((prevNotifications) => {
       const lastNotification = prevNotifications[prevNotifications.length - 1];
@@ -42,22 +42,6 @@ export const NotificationProvider = ({ children }) => {
     );
   };
 
-  useEffect(() => {
-    notifications.forEach((notification) => {
-      const timeoutId = setTimeout(() => {
-        removeNotification(notification.id);
-      }, 5000);
-
-      timeoutRefs.current.push(timeoutId);
-    });
-
-    const currentTimeouts = [...timeoutRefs.current];
-
-    return () => {
-      currentTimeouts.forEach((id) => clearTimeout(id));
-    };
-  }, [notifications]);
-
   return (
     <NotificationContext.Provider value={{ addNotification }}>
       {children}
@@ -82,6 +66,12 @@ export const NotificationProvider = ({ children }) => {
               ? "5"
               : ""
           }`}
+          onClose={(event, reason) => {
+            if (reason === "clickaway") {
+              return;
+            }
+            removeNotification(notification.id);
+          }}
         >
           <Alert
             severity={notification?.severity}

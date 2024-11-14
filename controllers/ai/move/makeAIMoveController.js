@@ -10,6 +10,7 @@ const {
   hasAnyLegalMoves,
   isKingInCheck,
   convertBoardToFEN,
+  indexToAlgebraic,
 } = require("../../moves/moveHelpers");
 const { generateAIMove } = require("./generateAIMoveController");
 

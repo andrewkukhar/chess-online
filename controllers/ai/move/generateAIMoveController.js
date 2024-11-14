@@ -99,13 +99,13 @@ exports.generateAIMove = async (game, boardState, fen, difficultyLevel) => {
   let temperature;
 
   if (difficultyLevel === "easy") {
-    temperature = 1.0; // Moderate randomness
+    temperature = 1.0;
   } else if (difficultyLevel === "medium") {
-    temperature = 0.5; // Moderate randomness
+    temperature = 0.5;
   } else if (difficultyLevel === "hard") {
-    temperature = 0.1; // Low randomness
+    temperature = 0.1;
   } else {
-    temperature = 0.5; // Default value
+    temperature = 0.5;
   }
 
   let difficultyInstructions;
