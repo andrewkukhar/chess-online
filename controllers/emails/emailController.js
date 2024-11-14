@@ -116,7 +116,7 @@ exports.sendGameLink = async (req, res) => {
     const link = `${process.env.REACT_APP_FRONTEND_URL}/login-via-token?token=${token}&link=${linkToGo}`;
 
     const welcomeMailOptions = {
-      from: `${senderName}, ${senderEmail}, <${process.env.EMAIL_USER}>`,
+      from: `${senderName}, ${senderEmail}, Chess Online <${process.env.EMAIL_USER}>`,
       replyTo: senderEmail,
       to: receiverEmailLower,
       subject: `Chess Online Invitaion from ${senderName}`,

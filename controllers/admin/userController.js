@@ -46,8 +46,19 @@ exports.updateUserById = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "User not found." });
     }
+    console.log("newPassword", newPassword);
 
-    if (oldPassword && newPassword) {
+    if (
+      req.user &&
+      (req.user.role === "admin" || req.user.role === "ak-admin") &&
+      newPassword
+    ) {
+      console.log("admin block exec:", newPassword);
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      rest.password = hashedPassword;
+    } else if (oldPassword && newPassword) {
       const isMatch = await bcrypt.compare(oldPassword, user.password);
       if (!isMatch) {
         return res.status(400).json({ message: "Old password is incorrect." });
@@ -57,6 +68,7 @@ exports.updateUserById = async (req, res) => {
       const hashedPassword = await bcrypt.hash(newPassword, salt);
       rest.password = hashedPassword;
     }
+    console.log("rest after pass saved:", rest);
 
     const updatedUser = await User.findByIdAndUpdate(userId, rest, {
       new: true,

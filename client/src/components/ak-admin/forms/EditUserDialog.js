@@ -10,13 +10,19 @@ import {
   DialogTitle,
   TextField,
   Button,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
   const { addNotification } = useContext(NotificationContext);
   const [updateUserById, { isLoading }] = useUpdateUserByIdMutation();
   const [editUserData, setEditUserData] = useState({});
-
+  const [newPassword, setNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  // console.log("user", user);
   useEffect(() => {
     if (user) {
       setEditUserData(user);
@@ -30,6 +36,7 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
       [name]: value,
     }));
   };
+  console.log("newPassword", newPassword);
 
   const handleEditUserSubmit = async () => {
     if (!user?.id) {
@@ -38,6 +45,11 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
     }
 
     const { id, ...userData } = editUserData;
+    if (newPassword) {
+      userData.newPassword = newPassword;
+    }
+    console.log("userData.newPassword", userData.newPassword);
+
     const result = await updateUserById({ userId: id, userData });
     if (result && result?.data) {
       addNotification(
@@ -55,6 +67,10 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
         "error"
       );
     }
+  };
+
+  const handleToggleNewPasswordVisibility = () => {
+    setShowNewPassword((prev) => !prev);
   };
 
   return (
@@ -100,6 +116,29 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
           value={editUserData.lastname || ""}
           onChange={handleEditUserChange}
           fullWidth
+        />
+        <TextField
+          margin="dense"
+          name="password"
+          label="New Password"
+          fullWidth
+          type={showNewPassword ? "text" : "password"}
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          sx={{ m: 0, p: 0, marginBottom: 2 }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleToggleNewPasswordVisibility}
+                  edge="end"
+                >
+                  {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
       </DialogContent>
       <DialogActions>
