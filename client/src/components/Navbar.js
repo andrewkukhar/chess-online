@@ -166,7 +166,7 @@ const Navbar = () => {
                 variant="subtitle1"
                 sx={{ padding: "0.5rem 1rem", textAlign: "center" }}
               >
-                Account Settings
+                {`Account Settings${username ? ": " + username : ""}`}
               </Typography>
               <Divider />
               <MenuItem
@@ -211,7 +211,7 @@ const Navbar = () => {
                   isSmallScreen ? <PublicIcon sx={iconButtonStyle} /> : null
                 }
               >
-                {isSmallScreen ? null : "Online"}
+                {isSmallScreen ? null : "Dashboard | Online"}
               </Button>
             </Tooltip>
             <Tooltip title="Play game locally" placement="bottom">

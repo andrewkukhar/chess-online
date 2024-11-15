@@ -1,5 +1,5 @@
 // src/contexts/NotificationContext.js
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useCallback } from "react";
 import { Snackbar, Alert, useMediaQuery } from "@mui/material";
 
 export const NotificationContext = createContext();
@@ -8,35 +8,51 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
 
-  const addNotification = (message, severity = "info", duration = 2500) => {
-    const id = new Date().getTime();
-    const autoHideDuration =
-      typeof duration === "number" && duration > 0 ? duration : 2500;
+  const addNotification = useCallback(
+    (message, severity = "info", duration = 2500) => {
+      const id = new Date().getTime();
+      const autoHideDuration =
+        typeof duration === "number" && duration > 0 ? duration : 2500;
 
-    setNotifications((prevNotifications) => {
-      const lastNotification = prevNotifications[prevNotifications.length - 1];
-      if (
-        lastNotification &&
-        lastNotification.message === message &&
-        lastNotification.severity === severity &&
-        id - lastNotification.id < 2000
-      ) {
-        return prevNotifications;
-      }
+      setNotifications((prevNotifications) => {
+        const lastNotification =
+          prevNotifications[prevNotifications.length - 1];
+        if (
+          lastNotification &&
+          lastNotification.message === message &&
+          lastNotification.severity === severity &&
+          id - lastNotification.id < 2000
+        ) {
+          return prevNotifications;
+        }
 
-      if (prevNotifications.length >= 3) {
-        prevNotifications.shift();
-      } else if (isSmallScreen && prevNotifications.length >= 2) {
-        prevNotifications.shift();
-      }
-      return [
-        ...prevNotifications,
-        { id, message, severity, autoHideDuration },
-      ];
-    });
+        if (prevNotifications.length >= 3) {
+          prevNotifications.shift();
+        } else if (isSmallScreen && prevNotifications.length >= 2) {
+          prevNotifications.shift();
+        }
+        return [
+          ...prevNotifications,
+          { id, message, severity, autoHideDuration, open: true },
+        ];
+      });
+    },
+    [isSmallScreen]
+  );
+
+  const handleCloseNotification = (id, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setNotifications((prevNotifications) =>
+      prevNotifications.map((notification) =>
+        notification.id === id ? { ...notification, open: false } : notification
+      )
+    );
   };
 
-  const removeNotification = (id) => {
+  const handleExitedNotification = (id) => {
     setNotifications((prevNotifications) =>
       prevNotifications.filter((notification) => notification.id !== id)
     );
@@ -48,7 +64,7 @@ export const NotificationProvider = ({ children }) => {
       {notifications?.map((notification, index) => (
         <Snackbar
           key={notification?.id}
-          open={true}
+          open={notification.open}
           autoHideDuration={notification?.autoHideDuration}
           anchorOrigin={{ vertical: "top", horizontal: "center" }}
           className={`notification-snackbar notification-snackbar-${
@@ -67,10 +83,12 @@ export const NotificationProvider = ({ children }) => {
               : ""
           }`}
           onClose={(event, reason) => {
-            if (reason === "clickaway") {
-              return;
-            }
-            removeNotification(notification.id);
+            handleCloseNotification(notification.id, reason);
+          }}
+          TransitionProps={{
+            onExited: () => {
+              handleExitedNotification(notification.id);
+            },
           }}
         >
           <Alert

@@ -38,35 +38,35 @@ export const SocketProvider = ({ children }) => {
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
       newSocket.on("newGame", (data) => {
-        console.log("newGame event received", data);
+        // console.log("newGame event received", data);
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
       newSocket.on("gameStatusUpdated", (data) => {
-        console.log("gameStatusUpdated event received", data);
+        // console.log("gameStatusUpdated event received", data);
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
       newSocket.on("playerJoinedGame", (data) => {
-        console.log("playerJoinedGame event received", data);
+        // console.log("playerJoinedGame event received", data);
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
       newSocket.on("playerLeftGame", (data) => {
-        console.log("playerLeftGame event received", data);
+        // console.log("playerLeftGame event received", data);
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
       newSocket.on("gameRemoved", (data) => {
-        console.log("gameRemoved event received", data);
+        // console.log("gameRemoved event received", data);
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
       newSocket.on("newMove", (data) => {
-        console.log("newMove event received", data);
+        // console.log("newMove event received", data);
         dispatch(moveApi.util.invalidateTags(["Move"]));
       });
       newSocket.on("moveUndone", (data) => {
-        console.log("moveUndone event received", data);
+        // console.log("moveUndone event received", data);
         dispatch(moveApi.util.invalidateTags(["Move"]));
       });
       newSocket.on("gameReset", (data) => {
-        console.log("gameReset event received", data);
+        // console.log("gameReset event received", data);
         dispatch(gameApi.util.invalidateTags(["Game"]));
       });
 

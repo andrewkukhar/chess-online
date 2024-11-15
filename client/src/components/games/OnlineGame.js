@@ -179,9 +179,10 @@ const OnlineGame = () => {
 
   useEffect(() => {
     if (!socket || !gameId) return;
+
     const handleNewMove = (data) => {
       if (data.gameId === gameId) {
-        console.log("handleNewMove data", data);
+        // console.log("handleNewMove data", data);
         addNotification("A new move has been made.", "info", 1000);
         setPlayerTurn(data.playerTurn);
         setLastMove({ from: data.moveFrom, to: data.moveTo });
@@ -200,7 +201,7 @@ const OnlineGame = () => {
         addNotification(
           data.message || `Check! The ${data.kingColor} king is under threat.`,
           "warning",
-          3500
+          2500
         );
       }
     };
@@ -255,6 +256,10 @@ const OnlineGame = () => {
         }
       }
     };
+
+    socket.off("newMove", handleNewMove);
+    socket.off("gameOver", handleGameOverEvent);
+    socket.off("checkToKing", handleCheckEvent);
 
     socket.on("newMove", handleNewMove);
     socket.on("gameOver", handleGameOverEvent);
@@ -371,7 +376,7 @@ const OnlineGame = () => {
     }
 
     const clickedPiece = squares[i];
-    console.log("clickedPiece", clickedPiece);
+    // console.log("clickedPiece", clickedPiece);
     if (selectedSquare === null) {
       if (clickedPiece && clickedPiece.player === (isHost ? 1 : 2)) {
         setSelectedSquare(i);
@@ -394,7 +399,7 @@ const OnlineGame = () => {
 
     if (isMovePossible) {
       const capturedPiece = squares[i];
-      console.log("capturedPiece", capturedPiece);
+      // console.log("capturedPiece", capturedPiece);
       const capturedData = capturedPiece
         ? {
             player: capturedPiece.player,
@@ -403,7 +408,7 @@ const OnlineGame = () => {
             type: capturedPiece.type,
           }
         : null;
-      console.log("capturedData", capturedData);
+      // console.log("capturedData", capturedData);
 
       handleMove(selectedSquare, i, sourcePiece, capturedData);
       setSelectedSquare(null);

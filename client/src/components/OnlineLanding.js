@@ -116,7 +116,7 @@ const OnlineLanding = () => {
           sx={{
             width: "100%",
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
             gap: "1rem",
@@ -135,7 +135,7 @@ const OnlineLanding = () => {
               Create Game
             </Button>
           </Tooltip>
-          <Tooltip title="Join an existing game session" >
+          <Tooltip title="Join an existing game session">
             <Button
               variant="contained"
               color="secondary"

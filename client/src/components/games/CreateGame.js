@@ -45,7 +45,7 @@ const CreateGame = () => {
         localStorage.setItem("currentGameId", result?.data?.game?._id);
         setTimeout(() => {
           navigate(`/game/${result?.data?.game?._id}`);
-        }, 2000);
+        }, 1000);
       } else {
         console.log("Error result:", result);
         addNotification(
@@ -63,7 +63,7 @@ const CreateGame = () => {
         localStorage.setItem("currentGameId", result?.data?.game?._id);
         setTimeout(() => {
           navigate(`/game/${result?.data?.game?._id}`);
-        }, 2000);
+        }, 1000);
       } else {
         console.log("Error result:", result);
         addNotification(
@@ -170,7 +170,7 @@ const CreateGame = () => {
         variant="contained"
         color="primary"
         onClick={handleCreateNewGame}
-        disabled={isLoading || isCreatingAIGame}
+        disabled={isLoading || isCreatingAIGame || !gameName.trim()}
         sx={{ marginTop: "2rem", width: "100%", padding: "0.75rem" }}
       >
         {isLoading || isCreatingAIGame ? (
