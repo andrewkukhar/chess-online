@@ -64,6 +64,7 @@
     │   ├── knight.js
     │   ├── pawn.js
     │   ├── piece.js
+    │   ├── pieceImages.js
     │   ├── queen.js
     │   └── rook.js
     ├── services
@@ -71,6 +72,7 @@
     │   │   ├── auth.js
     │   │   ├── check.js
     │   │   ├── email.js
+    │   │   ├── game-ai.js
     │   │   ├── game.js
     │   │   ├── move.js
     │   │   └── user.js
@@ -83,4 +85,4 @@
         ├── ProtectedRoute.js
         └── tokenUtils.js
 
-21 directories, 63 files
+21 directories, 65 files

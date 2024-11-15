@@ -34,7 +34,7 @@ const Login = () => {
 
       handleLogin({ token, userId, username, userrole });
       setTimeout(() => {
-        navigate("/online");
+        navigate("/dashboard");
       }, 1000);
     } catch (err) {
       console.error("Login failed:", err);

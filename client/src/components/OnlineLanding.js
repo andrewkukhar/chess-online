@@ -21,8 +21,7 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import { Delete, ExitToApp } from "@mui/icons-material";
 import { gameStatusTypes } from "../helpers/utils";
 
 const OnlineLanding = () => {
@@ -107,7 +106,7 @@ const OnlineLanding = () => {
     <div className="online-landing-page">
       <div className="online-landing-page-body">
         <Typography variant="h4" gutterBottom>
-          Play Online
+          Player Dashboard
         </Typography>
         <Typography variant="subtitle1" gutterBottom>
           Choose an option below to start your game.
@@ -115,35 +114,73 @@ const OnlineLanding = () => {
         <Box
           sx={{
             width: "100%",
+            maxWidth: "30rem",
             display: "flex",
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            gap: "1rem",
+            flexWrap: "wrap",
+            gap: "1rem 1rem",
+            m: 0,
+            p: 0,
             mt: 2,
             px: 2,
           }}
         >
-          <Tooltip title="Create a new game session" placement="bottom">
+          <Tooltip
+            title="Create a new online game session against another person"
+            placement="top"
+          >
             <Button
               variant="contained"
               color="primary"
               component={Link}
               to="/create"
-              fullWidth
+              className="online-landing-page-btn-item online-landing-page-btn-item-cog"
             >
-              Create Game
+              Create Online Game
             </Button>
           </Tooltip>
-          <Tooltip title="Join an existing game session">
+          <Tooltip
+            title="Create a new game session against AI bot"
+            placement="top"
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              component={Link}
+              to="/create?ai=true"
+              className="online-landing-page-btn-item online-landing-page-btn-item-caig"
+            >
+              Create Game Against AI
+            </Button>
+          </Tooltip>
+          <Tooltip
+            title="Join an existing online game session"
+            placement="bottom"
+          >
             <Button
               variant="contained"
               color="secondary"
               component={Link}
               to="/join"
-              fullWidth
+              className="online-landing-page-btn-item online-landing-page-btn-item-jog"
             >
-              Join Game
+              Join Online Game
+            </Button>
+          </Tooltip>
+          <Tooltip
+            title="Play a local game with someone near you"
+            placement="bottom"
+          >
+            <Button
+              variant="contained"
+              color="success"
+              component={Link}
+              to="/localgame"
+              className="online-landing-page-btn-item online-landing-page-btn-item-lg"
+            >
+              Local on current Device
             </Button>
           </Tooltip>
         </Box>
@@ -218,7 +255,7 @@ const OnlineLanding = () => {
                       color="warning"
                       onClick={() => openConfirmDialog("leave", game?._id)}
                     >
-                      <ExitToAppIcon />
+                      <ExitToApp />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Remove Game" placement="top">
@@ -226,7 +263,7 @@ const OnlineLanding = () => {
                       color="error"
                       onClick={() => openConfirmDialog("remove", game?._id)}
                     >
-                      <DeleteIcon />
+                      <Delete />
                     </IconButton>
                   </Tooltip>
                 </Box>

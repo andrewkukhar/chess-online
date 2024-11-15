@@ -14,13 +14,14 @@ import {
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/AuthContext";
-import LogoutIcon from "@mui/icons-material/Logout";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import HomeIcon from "@mui/icons-material/Home";
-import PublicIcon from "@mui/icons-material/Public";
-import MobileOffIcon from "@mui/icons-material/MobileOff";
-import LoginIcon from "@mui/icons-material/Login";
-import SettingsIcon from "@mui/icons-material/Settings";
+import {
+  GridView,
+  Home as HomeIcon,
+  AccountCircle as AccountCircleIcon,
+  MobileOff as MobileOffIcon,
+  Login as LoginIcon,
+  Settings as SettingsIcon,
+} from "@mui/icons-material";
 import UserSettingsDrawer from "./users/UserSettingsDrawer";
 
 const Navbar = () => {
@@ -46,6 +47,7 @@ const Navbar = () => {
   };
 
   const onLogout = () => {
+    setAnchorEl(null);
     handleLogout();
     navigate("/login");
   };
@@ -59,7 +61,13 @@ const Navbar = () => {
     setDrawerOpen(false);
   };
 
-  const iconStyle = { fontSize: "2.5rem", width: "2.5rem" };
+  const basicStyle = {
+    textAlign: "center",
+  };
+  const iconStyle = {
+    fontSize: "2.5rem",
+    width: "2.5rem",
+  };
   const iconButtonStyle = {
     fontSize: "3.5rem",
     width: "3.5rem",
@@ -135,6 +143,19 @@ const Navbar = () => {
                 </Button>
               </Tooltip>
             )}
+            <Tooltip title="Player Dashboard | All games" placement="bottom">
+              <Button
+                color="inherit"
+                component={Link}
+                to="/dashboard"
+                sx={isSmallScreen ? buttonStyle : basicStyle}
+                startIcon={
+                  isSmallScreen ? <GridView sx={iconButtonStyle} /> : null
+                }
+              >
+                {isSmallScreen ? null : "Dashboard"}
+              </Button>
+            </Tooltip>
             <Tooltip title={`${username} menu`}>
               <IconButton
                 color="inherit"
@@ -176,6 +197,13 @@ const Navbar = () => {
               >
                 Settings
               </MenuItem>
+              <MenuItem
+                component={Button}
+                onClick={onLogout}
+                sx={{ width: "100%" }}
+              >
+                Logout
+              </MenuItem>
             </Menu>
             <Drawer
               anchor="bottom"
@@ -192,41 +220,6 @@ const Navbar = () => {
             >
               <UserSettingsDrawer handleClose={handleDrawerClose} />
             </Drawer>
-            <Tooltip title="Logout" placement="bottom">
-              <IconButton
-                color="inherit"
-                onClick={onLogout}
-                sx={{ fontSize: "1rem" }}
-              >
-                {isSmallScreen ? <LogoutIcon sx={iconStyle} /> : "LOGOUT"}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Play online game" placement="bottom">
-              <Button
-                color="inherit"
-                component={Link}
-                to="/online"
-                sx={isSmallScreen ? buttonStyle : null}
-                startIcon={
-                  isSmallScreen ? <PublicIcon sx={iconButtonStyle} /> : null
-                }
-              >
-                {isSmallScreen ? null : "Dashboard | Online"}
-              </Button>
-            </Tooltip>
-            <Tooltip title="Play game locally" placement="bottom">
-              <Button
-                color="inherit"
-                component={Link}
-                to="/localgame"
-                sx={isSmallScreen ? buttonStyle : null}
-                startIcon={
-                  isSmallScreen ? <MobileOffIcon sx={iconButtonStyle} /> : null
-                }
-              >
-                {isSmallScreen ? null : "Local"}
-              </Button>
-            </Tooltip>
           </div>
         )}
       </div>

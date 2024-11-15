@@ -44,23 +44,30 @@ exports.resetGame = async (req, res) => {
       newGameName = `${game.name} Rematch 1.0`;
     }
 
+    const newPlayers = game.players.map((player) => ({
+      player: player.player,
+      isAI: player.isAI,
+      isOnlineInGameRoom: false,
+      difficultyLevel: player.isAI ? player.difficultyLevel : undefined,
+    }));
+
     const newGame = new Game({
       name: newGameName,
-      players: game.players,
+      players: newPlayers,
       status: "ongoing",
     });
 
     await newGame.save();
-    console.log("newGame.players", newGame.players);
-    console.log("game.players", game.players);
+    // console.log("newGame.players", newGame.players);
+    // console.log("game.players", game.players);
     const playerSockets = game.players
       .filter((p) => p.player)
       .map((p) => socket.getUserSocketId(p.player.toString()))
       .filter((socketId) => socketId);
-    console.log("playerSockets", playerSockets);
+    // console.log("playerSockets", playerSockets);
 
     playerSockets.forEach((socketId) => {
-      console.log("before gameReset socketId", socketId);
+      // console.log("before gameReset socketId", socketId);
 
       io.to(socketId).emit("gameReset", {
         oldGameId: game._id,

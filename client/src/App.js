@@ -1,11 +1,6 @@
 // src/App.js
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import AdminDashboard from "./components/ak-admin/AdminDashboard";
 import CreateGame from "./components/games/CreateGame";
@@ -18,6 +13,7 @@ import Navbar from "./components/Navbar";
 import OnlineLanding from "./components/OnlineLanding";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import LoginViaToken from "./services/hooks/LoginViaToken";
+import GameLanding from "./components/games/GameLanding";
 
 import "./App.scss";
 
@@ -36,7 +32,7 @@ const App = () => {
               <Route path="/localgame" element={<LocalGame />} />
               <Route path="/login-via-token" element={<LoginViaToken />} />
               <Route
-                path="/online"
+                path="/dashboard"
                 element={
                   <ProtectedRoute>
                     <OnlineLanding />
@@ -75,7 +71,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route path="*" element={<Navigate to="/localgame" replace />} />
+              <Route path="*" element={<GameLanding />} />
             </Routes>
           </div>
         </Router>

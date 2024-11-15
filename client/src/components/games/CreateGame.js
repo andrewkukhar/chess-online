@@ -1,6 +1,6 @@
 // src/components/CreateGame.js
-import React, { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useContext, useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { NotificationContext } from "../../contexts/NotificationContext";
 import { useCreateGameMutation } from "../../services/api-services/game";
 import { useCreateGameAgainstAIMutation } from "../../services/api-services/game-ai";
@@ -10,14 +10,13 @@ import {
   Typography,
   CircularProgress,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Select,
   MenuItem,
 } from "@mui/material";
 
 const CreateGame = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { addNotification } = useContext(NotificationContext);
   const [gameName, setGameName] = useState("");
   const [againstAI, setAgainstAI] = useState(false);
@@ -27,6 +26,14 @@ const CreateGame = () => {
   const [createGameAgainstAI, { isLoading: isCreatingAIGame }] =
     useCreateGameAgainstAIMutation();
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("ai") === "true") {
+      setAgainstAI(true);
+    }
+  }, [location]);
+
+  // console.log("againstAI", againstAI);
   const handleCreateNewGame = async () => {
     if (!gameName.trim()) {
       addNotification(`Please enter a valid game name!`, "warning");
@@ -122,16 +129,6 @@ const CreateGame = () => {
             },
           },
         }}
-      />
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={againstAI}
-            onChange={(e) => setAgainstAI(e.target.checked)}
-          />
-        }
-        label="Play against AI"
-        sx={{ marginBottom: "1rem" }}
       />
       {againstAI && (
         <Select

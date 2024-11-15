@@ -46,7 +46,8 @@ const OnlineGame = () => {
   const [winnerName, setWinnerName] = useState(null);
 
   const [selectedSquare, setSelectedSquare] = useState(null);
-  const { addNotification } = useContext(NotificationContext);
+  const { addNotification, clearNotifications } =
+    useContext(NotificationContext);
 
   const [confirmDialog, setConfirmDialog] = useState({
     open: false,
@@ -103,7 +104,7 @@ const OnlineGame = () => {
       if (storedGameId) {
         setGameId(storedGameId);
       } else {
-        navigate("/online");
+        navigate("/dashboard");
       }
     }
   }, [paramGameId, navigate, joinGameRoom]);
@@ -280,6 +281,8 @@ const OnlineGame = () => {
         "playerGameRoomStatusUpdated",
         handlePlayerGameRoomStatusUpdated
       );
+
+      clearNotifications();
     };
   }, [
     socket,
@@ -289,6 +292,7 @@ const OnlineGame = () => {
     refetchMoves,
     refetchGameData,
     addNotification,
+    clearNotifications,
   ]);
 
   const handleConfirmReset = async () => {

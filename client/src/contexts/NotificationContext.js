@@ -7,7 +7,7 @@ export const NotificationContext = createContext();
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const isSmallScreen = useMediaQuery("(max-width:600px)");
-
+  // console.log("NotificationProvider DEBUG: init: notifications", notifications);
   const addNotification = useCallback(
     (message, severity = "info", duration = 2500) => {
       const id = new Date().getTime();
@@ -39,6 +39,10 @@ export const NotificationProvider = ({ children }) => {
     },
     [isSmallScreen]
   );
+  // console.log(
+  //   "NotificationProvider DEBUG: first chnages: notifications",
+  //   notifications
+  // );
 
   const handleCloseNotification = (id, reason) => {
     if (reason === "clickaway") {
@@ -58,8 +62,18 @@ export const NotificationProvider = ({ children }) => {
     );
   };
 
+  const clearNotifications = useCallback(() => {
+    setNotifications([]);
+  }, []);
+  // console.log(
+  //   "NotificationProvider DEBUG: last chnages: notifications",
+  //   notifications
+  // );
+
   return (
-    <NotificationContext.Provider value={{ addNotification }}>
+    <NotificationContext.Provider
+      value={{ addNotification, clearNotifications }}
+    >
       {children}
       {notifications?.map((notification, index) => (
         <Snackbar
