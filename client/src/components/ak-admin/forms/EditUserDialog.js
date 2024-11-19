@@ -36,7 +36,6 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
       [name]: value,
     }));
   };
-  console.log("newPassword", newPassword);
 
   const handleEditUserSubmit = async () => {
     if (!user?.id) {
@@ -48,7 +47,6 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
     if (newPassword) {
       userData.newPassword = newPassword;
     }
-    console.log("userData.newPassword", userData.newPassword);
 
     const result = await updateUserById({ userId: id, userData });
     if (result && result?.data) {
@@ -61,7 +59,6 @@ const EditUserDialog = ({ open, onClose, user, refetchUsers }) => {
         refetchUsers?.();
       }, 1500);
     } else {
-      console.log("Error result:", result);
       addNotification(
         result?.error?.data?.message || `Failed to update user!`,
         "error"

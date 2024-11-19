@@ -123,34 +123,34 @@ exports.generateAIMove = async (game, boardState, fen, difficultyLevel) => {
   }
 
   console.log("generateAIMove temperature:", temperature);
-  console.log("generateAIMove difficultyInstructions:", difficultyInstructions);
+  console.log("generateAIMove difficultyLevel:", difficultyLevel);
 
   const prompt = [
     {
       role: "system",
       content: `
-You are a chess engine that provides valid chess moves in the specific format 'fromSquare toSquare (pieceType)' without any extra details.
+You are a chess grandmaster providing the best possible move for Black.
 
-${difficultyInstructions}
+- Analyze the current board state thoroughly.
+- Consider tactical and strategic factors such as material balance, king safety, piece activity, and pawn structure.
+- Avoid repetitive opening moves; vary your strategy to be less predictable.
+- Adjust your play style based on the specified difficulty level: 
+  - For 'easy', play like a beginner club player.
+  - For 'medium', play like an experienced club player.
+  - For 'hard', play like a grandmaster.
 
-Given the current board state and the list of legal moves, you should:
-
-- Choose the best move for Black from the provided list of legal moves.
-- Ensure the move follows all standard chess rules.
-- Make new move based on previous and the next that you can do to get closer to winning the game, but do not forget about defense.
-- Do not choose moves that would leave your own king in check.
-- Do not repeat invalid moves or previous moves.
-- Provide only one move in the specified format.
-- The move must be from the provided list of legal moves.
-
-The previous moves are: ${
-        previousMoves ? previousMoves : "No previous moves have been made"
-      }.
+Provide the best move for Black in the format 'fromSquare toSquare (pieceType)' without any additional commentary.
 
 **Current board state:**
 \`\`\`
 ${boardMatrix}
 \`\`\`
+
+**Previous moves:**
+${previousMoves ? previousMoves : "No previous moves have been made"}.
+
+**Difficulty level:**
+${difficultyLevel}
 
 **Legal moves for Black:**
 ${legalMoves.join(", ")}

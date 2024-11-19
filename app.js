@@ -61,11 +61,3 @@ const PORT = process.env.PORT || 5000;
     console.log(`Server (HTTP & WebSocket) is running on PORT ${PORT}`);
   });
 })();
-
-// function indexToAlgebraic(index) {
-//   const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
-//   const rank = 8 - Math.floor(index / 8); // Corrected rank calculation
-//   const file = files[index % 8];
-//   return `${file}${rank}`;
-// }
-// console.log(`test ${indexToAlgebraic(15)}`);

@@ -85,6 +85,18 @@ const GamesTab = () => {
     }
   };
 
+  const getGameType = (players) => {
+    const aiPlayers = players?.filter((p) => p?.isAI);
+    const humanPlayers = players?.filter((p) => !p?.isAI);
+    if (aiPlayers?.length > 0 && humanPlayers?.length > 0) {
+      return "Human vs AI";
+    } else if (aiPlayers?.length > 0) {
+      return "AI vs AI";
+    } else {
+      return "Human vs Human";
+    }
+  };
+
   const columns = [
     {
       field: "actions",
@@ -104,6 +116,12 @@ const GamesTab = () => {
     { field: "name", headerName: "Name", width: 150 },
     { field: "status", headerName: "Status", width: 150 },
     {
+      field: "gameType",
+      headerName: "Game Type",
+      width: 150,
+      valueGetter: (value, row) => getGameType(row?.players),
+    },
+    {
       field: "createdAt",
       headerName: "Created At",
       width: 200,
@@ -112,9 +130,15 @@ const GamesTab = () => {
     {
       field: "players",
       headerName: "Players",
-      width: 300,
+      width: 200,
       valueGetter: (value, row) =>
-        row.players.map((p) => p.player?.username).join(", "),
+        row.players
+          .map((p) => {
+            const username = p.player?.username || "AI";
+            const aiDifficulty = p?.isAI ? `(${p?.difficultyLevel})` : "";
+            return `${username} ${aiDifficulty}`;
+          })
+          .join(", "),
     },
     {
       field: "winner",
@@ -122,6 +146,19 @@ const GamesTab = () => {
       width: 150,
       valueGetter: (value, row) =>
         row.winner ? row.winner.username : "No Winner",
+    },
+    {
+      field: "gameDuration",
+      headerName: "Game Duration",
+      width: 150,
+      valueGetter: (value, row) => {
+        const startTime = new Date(row?.createdAt);
+        const lastMove = row?.moves?.[row?.moves?.length - 1];
+        const endTime = lastMove ? new Date(lastMove?.timestamp) : new Date();
+        const durationMs = endTime - startTime;
+        const durationMinutes = Math.floor(durationMs / 60000);
+        return `${durationMinutes} min`;
+      },
     },
     {
       field: "lastMove",
