@@ -21,7 +21,12 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import { Restore } from "@mui/icons-material";
+import {
+  Restore,
+  HourglassEmpty,
+  HourglassTop,
+  HourglassBottom,
+} from "@mui/icons-material";
 import { AuthContext } from "../../contexts/AuthContext";
 import { useSocket } from "../../contexts/SocketContext";
 import { NotificationContext } from "../../contexts/NotificationContext";
@@ -479,6 +484,25 @@ const OnlineGame = () => {
     return playerData && playerData.isOnlineInGameRoom;
   };
 
+  const HourglassAnimation = () => {
+    const [currentIcon, setCurrentIcon] = useState(0);
+    const icons = [
+      <HourglassEmpty sx={{ fontSize: "2rem", color: "white" }} />,
+      <HourglassTop sx={{ fontSize: "2rem", color: "white" }} />,
+      <HourglassBottom sx={{ fontSize: "2rem", color: "white" }} />,
+    ];
+
+    useEffect(() => {
+      const interval = setInterval(() => {
+        setCurrentIcon((prev) => (prev + 1) % icons.length);
+      }, 750); // Change icon every 500 milliseconds
+
+      return () => clearInterval(interval); // eslint-disable-next-line
+    }, []);
+
+    return icons[currentIcon];
+  };
+
   if (gameLoading || movesLoading) {
     return (
       <Box
@@ -497,44 +521,37 @@ const OnlineGame = () => {
   return (
     <div className="game">
       <div className="game-header">
-        <Box
-          sx={{
-            margin: "0.5rem 1rem",
-            padding: "0.25rem 2rem",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            gap: "0.5rem",
-          }}
-        >
+        <Box className="game-header-title">
           <Typography variant="h7" mr={2}>
             Online Game Room - {gameData?.name || gameId}
           </Typography>
-          {!gameData?.players?.some((p) => p?.isAI) && (
-            <>
-              <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => {
-                  navigator.clipboard.writeText(`${gameId}`);
-                  addNotification(`Game link copied to clipboard.`, "success");
-                }}
-                disabled={!gameId}
-              >
-                Copy Game Link
-              </Button>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleInviteClick}
-                disabled={!gameId || gameData?.players?.some((p) => p?.isAI)}
-              >
-                Invite by Email
-              </Button>
-            </>
-          )}
+          {!gameData?.players?.some((p) => p?.isAI) &&
+            shouldShowSwitchOption && (
+              <>
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${gameId}`);
+                    addNotification(
+                      `Game link copied to clipboard.`,
+                      "success"
+                    );
+                  }}
+                  disabled={!gameId}
+                >
+                  Copy Game Link
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleInviteClick}
+                  disabled={!gameId || gameData?.players?.some((p) => p?.isAI)}
+                >
+                  Invite by Email
+                </Button>
+              </>
+            )}
           {!gameData?.players?.some((p) => p?.isAI) &&
             shouldShowSwitchOption && (
               <Button
@@ -576,34 +593,48 @@ const OnlineGame = () => {
             </Tooltip>
           </Box>
         </Box>
-        <Box>
-          <Typography variant="h6" mt={1}>
-            Players:{" "}
-            <PlayerStatusBadge
-              isOnline={isPlayerOnline(gameData?.players?.[0]?.player?._id)}
-              playerInitial={
-                gameData?.players?.[0]?.player?.username
-                  ?.charAt(0)
-                  .toUpperCase() || "P"
-              }
-            />
-            {gameData?.players?.[0]?.player?.username || "Player 1"} vs{" "}
-            {gameData?.players?.some((p) => p?.isAI) ? (
-              "AI Bot"
-            ) : (
-              <>
-                <PlayerStatusBadge
-                  isOnline={isPlayerOnline(gameData?.players?.[1]?.player?._id)}
-                  playerInitial={
-                    gameData?.players?.[1]?.player?.username
-                      ?.charAt(0)
-                      .toUpperCase() || "P"
-                  }
-                />
-                {gameData?.players?.[1]?.player?.username || "Player 2"}
-              </>
-            )}
-          </Typography>
+        <Box className="game-header-players-info">
+          <Typography variant="h6">Players: </Typography>
+          <div className="game-header-players-info-box">
+            <div className="game-header-players-info-box-item">
+              <PlayerStatusBadge
+                isOnline={isPlayerOnline(gameData?.players?.[0]?.player?._id)}
+                playerInitial={
+                  gameData?.players?.[0]?.player?.username
+                    ?.charAt(0)
+                    .toUpperCase() || "P"
+                }
+              />
+              {gameData?.players?.[0]?.player?.username || "Player 1"}
+            </div>
+            VS{" "}
+            <div className="game-header-players-info-box-item">
+              {gameData?.players?.some((p) => p?.isAI) ? (
+                <>
+                  AI Bot
+                  {isWaitingForAI && (
+                    <div className="game-header-players-info-box-item-wating-box">
+                      <HourglassAnimation />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <PlayerStatusBadge
+                    isOnline={isPlayerOnline(
+                      gameData?.players?.[1]?.player?._id
+                    )}
+                    playerInitial={
+                      gameData?.players?.[1]?.player?.username
+                        ?.charAt(0)
+                        .toUpperCase() || "P"
+                    }
+                  />
+                  {gameData?.players?.[1]?.player?.username || "Player 2"}
+                </>
+              )}
+            </div>
+          </div>
         </Box>
         <Box
           sx={{

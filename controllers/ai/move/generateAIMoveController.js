@@ -127,7 +127,7 @@ exports.generateAIMove = async (game, boardState, fen, difficultyLevel) => {
 
   const prompt = [
     {
-      role: "system",
+      role: "user",
       content: `
 You are a chess grandmaster providing the best possible move for Black.
 
@@ -162,11 +162,11 @@ Provide the next best move for Black in the format 'fromSquare toSquare (pieceTy
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "o1-mini",
       messages: prompt,
-      max_tokens: 50,
-      temperature: temperature,
+      // max_completion_tokens: 150,
     });
+    console.log("generateAIMove completion:", completion);
 
     if (
       !completion.choices ||
@@ -179,7 +179,7 @@ Provide the next best move for Black in the format 'fromSquare toSquare (pieceTy
     }
 
     const reply = completion.choices[0].message.content.trim();
-    // console.log("generateAIMove reply:", reply);
+    console.log("generateAIMove reply:", reply);
 
     const aiMove = parseAIMove(reply, boardState, 2);
     // console.log("generateAIMove aiMove:", aiMove);
