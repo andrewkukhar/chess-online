@@ -25,10 +25,19 @@ const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
 
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email?.trim()) {
       addNotification("Player email is required.", "error");
+      return;
+    }
+    if (!validateEmail(email)) {
+      addNotification("Please enter a valid email address.", "error");
       return;
     }
     if (!username?.trim()) {
@@ -37,6 +46,10 @@ const Register = () => {
     }
     if (!password?.trim()) {
       addNotification("Player password is required.", "error");
+      return;
+    }
+    if (password.length < 6) {
+      addNotification("Password must be at least 6 characters long.", "error");
       return;
     }
 
@@ -100,6 +113,12 @@ const Register = () => {
             InputLabelProps={{
               className: "MuiInputLabel-root",
             }}
+            error={email && !validateEmail(email)}
+            helperText={
+              email && !validateEmail(email)
+                ? "Please enter a valid email address."
+                : ""
+            }
           />
           <TextField
             margin="normal"
@@ -117,6 +136,12 @@ const Register = () => {
             InputLabelProps={{
               className: "MuiInputLabel-root",
             }}
+            error={username && username.length < 3}
+            helperText={
+              username && username.length < 3
+                ? "Username must be at least 3 characters long."
+                : ""
+            }
           />
           <TextField
             margin="normal"
@@ -146,13 +171,26 @@ const Register = () => {
             InputLabelProps={{
               className: "MuiInputLabel-root",
             }}
+            error={password && password.length < 6}
+            helperText={
+              password && password.length < 6
+                ? "Password must be at least 6 characters long."
+                : ""
+            }
           />
           <Button
             type="submit"
             fullWidth
             variant="contained"
             color="primary"
-            disabled={isLoading}
+            disabled={
+              isLoading ||
+              !email ||
+              !username ||
+              username.length < 3 ||
+              password.length < 6 ||
+              !validateEmail(email)
+            }
             sx={{ mt: 3, mb: 2 }}
           >
             {isLoading ? <CircularProgress /> : "Register"}
