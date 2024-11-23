@@ -101,6 +101,7 @@ const OnlineLanding = () => {
         return game?.status === gameFilter?.toLowerCase();
       })
     : [];
+  // console.log("filteredGames", filteredGames);
 
   return (
     <div className="online-landing-page">
@@ -224,51 +225,68 @@ const OnlineLanding = () => {
               gap: "1rem",
             }}
           >
-            {filteredGames?.map((game) => (
-              <Box
-                key={game?._id}
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "0.5rem 1rem",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                }}
-              >
-                <Typography
-                  component={Link}
-                  to={`/game/${game?._id}`}
+            {filteredGames?.map((game) => {
+              const opponent = game.players?.find(
+                (p) => p?.player?._id !== userId
+              );
+              const opponentInfo = opponent
+                ? opponent.isAI
+                  ? " & AI Bot"
+                  : ` & ${
+                      opponent?.player?.firstname
+                        ? opponent?.player?.firstname +
+                          " " +
+                          opponent?.player?.lastname?.charAt(0)
+                        : opponent?.player?.username
+                    }`
+                : "";
+
+              return (
+                <Box
+                  key={game?._id}
                   sx={{
-                    textDecoration: "none",
-                    color: "inherit",
-                    "&:hover": {
-                      textDecoration: "underline",
-                    },
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "0.5rem 1rem",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
                   }}
                 >
-                  {game?.name || `Game ${game?._id}`}
-                </Typography>
-                <Box>
-                  <Tooltip title="Leave Game" placement="top">
-                    <IconButton
-                      color="warning"
-                      onClick={() => openConfirmDialog("leave", game?._id)}
-                    >
-                      <ExitToApp />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Remove Game" placement="top">
-                    <IconButton
-                      color="error"
-                      onClick={() => openConfirmDialog("remove", game?._id)}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </Tooltip>
+                  <Typography
+                    component={Link}
+                    to={`/game/${game?._id}`}
+                    sx={{
+                      textDecoration: "none",
+                      color: "inherit",
+                      "&:hover": {
+                        textDecoration: "underline",
+                      },
+                    }}
+                  >
+                    {game?.name || `Game ${game?._id}`} {opponentInfo}
+                  </Typography>
+                  <Box>
+                    <Tooltip title="Leave Game" placement="top">
+                      <IconButton
+                        color="warning"
+                        onClick={() => openConfirmDialog("leave", game?._id)}
+                      >
+                        <ExitToApp />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Remove Game" placement="top">
+                      <IconButton
+                        color="error"
+                        onClick={() => openConfirmDialog("remove", game?._id)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
                 </Box>
-              </Box>
-            ))}
+              );
+            })}
           </Box>
         ) : (
           <Typography variant="body1" sx={{ mt: 2 }}>
