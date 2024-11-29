@@ -1,5 +1,5 @@
 // src/components/OnlineGame.js
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useMakeMoveMutation,
@@ -41,6 +41,7 @@ import PlayerStatusBadge from "../../helpers/PlayerStatusBadge";
 const OnlineGame = () => {
   const { gameId: paramGameId } = useParams();
   const navigate = useNavigate();
+  console.log("paramGameId:", paramGameId);
 
   const { socket } = useSocket();
   const { userId } = useContext(AuthContext);
@@ -89,6 +90,33 @@ const OnlineGame = () => {
   const [lastMove, setLastMove] = useState({ from: null, to: null });
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [isWaitingForAI, setIsWaitingForAI] = useState(false);
+
+  const handleNewMove = useCallback(
+    (data) => {
+      if (data.gameId === gameId) {
+        addNotification("A new move has been made.", "info", 1000);
+        setPlayerTurn(data.playerTurn);
+        setLastMove({ from: data.moveFrom, to: data.moveTo });
+        refetchMoves();
+        refetchGameData();
+      }
+    },
+    [
+      gameId,
+      addNotification,
+      setPlayerTurn,
+      setLastMove,
+      refetchMoves,
+      refetchGameData,
+    ]
+  );
+
+  useEffect(() => {
+    if (gameId) {
+      refetchGameData();
+      refetchMoves();
+    }
+  }, [gameId, refetchGameData, refetchMoves]);
 
   useEffect(() => {
     if (paramGameId) {
@@ -143,6 +171,24 @@ const OnlineGame = () => {
   }, [gameData, userId]);
 
   useEffect(() => {
+    if (gameData) {
+      if (gameData.nextTurn) {
+        setPlayerTurn(gameData.nextTurn);
+      } else if (gameData.moves) {
+        const totalMoves = gameData.moves.length;
+        const nextPlayerTurn = totalMoves % 2 === 0 ? "white" : "black";
+        setPlayerTurn(nextPlayerTurn);
+      }
+
+      if (gameData.winner) {
+        setWinnerName(gameData.winner.username || "Unknown");
+      } else {
+        setWinnerName(null);
+      }
+    }
+  }, [gameData]);
+
+  useEffect(() => {
     if (movesData && movesData.moves) {
       const initialBoard = initialiseChessBoard();
       const fallenWhite = [];
@@ -184,18 +230,14 @@ const OnlineGame = () => {
   }, [movesData, gameData]);
 
   useEffect(() => {
-    if (!socket || !gameId) return;
-
-    const handleNewMove = (data) => {
-      if (data.gameId === gameId) {
-        // console.log("handleNewMove data", data);
-        addNotification("A new move has been made.", "info", 1000);
-        setPlayerTurn(data.playerTurn);
-        setLastMove({ from: data.moveFrom, to: data.moveTo });
-        refetchMoves?.();
-        refetchGameData?.();
-      }
-    };
+    if (!socket) {
+      console.log("Socket not connected yet.");
+      return;
+    }
+    if (!gameId) {
+      console.log("Game ID not set yet.");
+      return;
+    }
     const handleGameOverEvent = (data) => {
       if (data.gameId === gameId) {
         addNotification(data.message, "success");
@@ -293,12 +335,14 @@ const OnlineGame = () => {
     socket,
     gameId,
     userId,
+    handleNewMove,
     navigate,
     refetchMoves,
     refetchGameData,
     addNotification,
     clearNotifications,
   ]);
+  // console.log("gameData", gameData);
 
   const handleConfirmReset = async () => {
     const result = await resetGameApi({ gameId });
@@ -318,10 +362,19 @@ const OnlineGame = () => {
   };
 
   const handleMove = async (from, to, piece, captured) => {
+    if (!gameId) {
+      addNotification(`Game ID are missing.`, "error");
+      return;
+    }
     if (!playerColor || isWaitingForAI) {
       addNotification(`Player color not determined.`, "error");
       return;
     }
+    if (!from || !to || !piece?.type) {
+      addNotification(`Move data are missing.`, "error");
+      return;
+    }
+
     const result = await makeMove({
       gameId,
       move: { from, to, piece: piece?.type, captured },
@@ -459,7 +512,14 @@ const OnlineGame = () => {
 
   const shouldShowSwitchOption =
     gameData &&
+    !gameData?.players?.some((p) => p?.isAI) &&
     gameData?.players?.length === 2 &&
+    gameData?.moves?.length === 0;
+
+  const shouldShowGameInviteOptions =
+    gameData &&
+    !gameData?.players?.some((p) => p?.isAI) &&
+    gameData?.players?.length === 1 &&
     gameData?.moves?.length === 0;
 
   const getPlayerNameByColor = (color) => {
@@ -517,6 +577,11 @@ const OnlineGame = () => {
       </Box>
     );
   }
+  console.log("socket:", socket);
+  console.log("gameId:", gameId);
+  console.log("paramGameId:", paramGameId);
+  console.log("userId:", userId);
+  console.log("gameData:", gameData);
 
   return (
     <div className="game">
@@ -525,45 +590,40 @@ const OnlineGame = () => {
           <Typography variant="h7" mr={2}>
             Online Game Room - {gameData?.name || gameId}
           </Typography>
-          {!gameData?.players?.some((p) => p?.isAI) &&
-            shouldShowSwitchOption && (
-              <>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${gameId}`);
-                    addNotification(
-                      `Game link copied to clipboard.`,
-                      "success"
-                    );
-                  }}
-                  disabled={!gameId}
-                >
-                  Copy Game Link
-                </Button>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleInviteClick}
-                  disabled={!gameId || gameData?.players?.some((p) => p?.isAI)}
-                >
-                  Invite by Email
-                </Button>
-              </>
-            )}
-          {!gameData?.players?.some((p) => p?.isAI) &&
-            shouldShowSwitchOption && (
+          {shouldShowGameInviteOptions && (
+            <>
               <Button
                 variant="outlined"
-                color="info"
-                onClick={() =>
-                  setConfirmDialog({ open: true, action: "switchRoles" })
-                }
+                color="primary"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${gameId}`);
+                  addNotification(`Game link copied to clipboard.`, "success");
+                }}
+                disabled={!gameId}
               >
-                Switch Roles
+                Copy Game Link
               </Button>
-            )}
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handleInviteClick}
+                disabled={!gameId || gameData?.players?.some((p) => p?.isAI)}
+              >
+                Invite by Email
+              </Button>
+            </>
+          )}
+          {shouldShowSwitchOption && (
+            <Button
+              variant="outlined"
+              color="info"
+              onClick={() =>
+                setConfirmDialog({ open: true, action: "switchRoles" })
+              }
+            >
+              Switch Roles
+            </Button>
+          )}
           <Box
             sx={{
               margin: "0.5rem",

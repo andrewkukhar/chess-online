@@ -91,7 +91,6 @@ exports.generateAIMove = async (game, boardState, fen, difficultyLevel) => {
     })
     .join(", ");
   // console.log("generateAIMove previousMoves:", previousMoves);
-  console.log("generateAIMove difficultyLevel:", difficultyLevel);
 
   const legalMoves = getAllLegalMoves(boardState, 2);
   const boardMatrix = createBoardMatrix(boardState);
@@ -121,9 +120,6 @@ exports.generateAIMove = async (game, boardState, fen, difficultyLevel) => {
   } else {
     difficultyInstructions = "";
   }
-
-  console.log("generateAIMove temperature:", temperature);
-  console.log("generateAIMove difficultyLevel:", difficultyLevel);
 
   const prompt = [
     {
@@ -166,7 +162,7 @@ Provide the next best move for Black in the format 'fromSquare toSquare (pieceTy
       messages: prompt,
       // max_completion_tokens: 150,
     });
-    console.log("generateAIMove completion:", completion);
+    // console.log("generateAIMove completion:", completion);
 
     if (
       !completion.choices ||
@@ -179,7 +175,7 @@ Provide the next best move for Black in the format 'fromSquare toSquare (pieceTy
     }
 
     const reply = completion.choices[0].message.content.trim();
-    console.log("generateAIMove reply:", reply);
+    // console.log("generateAIMove reply:", reply);
 
     const aiMove = parseAIMove(reply, boardState, 2);
     // console.log("generateAIMove aiMove:", aiMove);
