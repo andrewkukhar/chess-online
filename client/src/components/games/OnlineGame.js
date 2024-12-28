@@ -374,7 +374,13 @@ const OnlineGame = () => {
       addNotification(`Player color not determined.`, "error");
       return;
     }
-    if (!from || !to || !piece?.type) {
+    if (
+      from === null ||
+      from === undefined ||
+      to === null ||
+      to === undefined ||
+      !piece?.type
+    ) {
       console.log("Move data are missing if block:", from, to, piece, captured);
 
       addNotification(`Move data are missing.`, "error");
