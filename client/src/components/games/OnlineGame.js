@@ -362,6 +362,10 @@ const OnlineGame = () => {
   };
 
   const handleMove = async (from, to, piece, captured) => {
+    console.log("handleMove from:", from);
+    console.log("handleMove to:", to);
+    console.log("handleMove piece:", piece);
+    console.log("handleMove captured:", captured);
     if (!gameId) {
       addNotification(`Game ID are missing.`, "error");
       return;
@@ -371,6 +375,8 @@ const OnlineGame = () => {
       return;
     }
     if (!from || !to || !piece?.type) {
+      console.log("Move data are missing if block:", from, to, piece, captured);
+
       addNotification(`Move data are missing.`, "error");
       return;
     }
